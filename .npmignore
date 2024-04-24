@@ -1,0 +1,14 @@
+.git
+.github
+coverage
+node_modules
+test
+
+.codeclimate.yml
+.eslintignore
+.eslintrc.json
+.gitignore
+.npmignore
+.prettierignore
+.prettierrc.json
+tsconfig.json
