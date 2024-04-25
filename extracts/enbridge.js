@@ -31,11 +31,9 @@ const enbridgeDataExtractOptions = {
             yPercentage: 49
         },
         processingFunction(tesseractResult) {
-            let text = tesseractResult.data.text.trim();
-            text = trimTextFromEndUntil(text, /m/);
-            text = text.replaceAll(',', '');
-            text = text.slice(0, -1);
-            return Number.parseInt(text);
+            const textPieces = tesseractResult.data.text.trim().split('\n');
+            const text = textPieces.at(-1) ?? '';
+            return trimToNumber(text);
         }
     },
     totalAmountDue: {
