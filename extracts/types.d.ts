@@ -11,7 +11,7 @@ export interface DataFieldCoordinate {
     yPercentage: number;
 }
 export interface BillData extends Record<string, unknown> {
-    totalAmountDue: number | undefined;
     accountNumber: string;
+    totalAmountDue: number | undefined;
     dueDate: string;
 }

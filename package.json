@@ -5,7 +5,8 @@
   "description": "Extracts data from scanned bill documents into usable details.",
   "exports": {
     ".": "./index.js",
-    "./enbridge.js": "./extracts/enbridge.js"
+    "./enbridge.js": "./extracts/enbridge.js",
+    "./ssmpuc.js": "./extracts/ssmpuc.js"
   },
   "scripts": {
     "test": "cross-env DEBUG=bill-data-extract:* node --test",

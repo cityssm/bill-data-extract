@@ -1,4 +1,5 @@
-import { trimTextFromEndUntil, trimTextFromStartUntil } from '../dataHelpers.js';
+import { trimToNumber } from '../helpers/numbers.js';
+import { trimTextFromEndUntil } from '../helpers/trimmers.js';
 import { extractData } from '../index.js';
 const enbridgeDataExtractOptions = {
     accountNumber: {
@@ -48,15 +49,7 @@ const enbridgeDataExtractOptions = {
             yPercentage: 47
         },
         processingFunction(tesseractResult) {
-            let text = tesseractResult.data.text.trim();
-            text = trimTextFromStartUntil(text, /\d/);
-            text = text.replace(',', '');
-            try {
-                return Number.parseFloat(text);
-            }
-            catch {
-                return undefined;
-            }
+            return trimToNumber(tesseractResult.data.text);
         }
     },
     dueDate: {

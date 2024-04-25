@@ -1,4 +1,5 @@
-import { trimTextFromEndUntil, trimTextFromStartUntil } from '../dataHelpers.js'
+import { trimToNumber } from '../helpers/numbers.js'
+import { trimTextFromEndUntil } from '../helpers/trimmers.js'
 import { extractData } from '../index.js'
 
 import type { BillData, DataExtractOptions } from './types.js'
@@ -53,15 +54,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
       yPercentage: 47
     },
     processingFunction(tesseractResult): number | undefined {
-      let text = tesseractResult.data.text.trim()
-      text = trimTextFromStartUntil(text, /\d/)
-      text = text.replace(',', '')
-
-      try {
-        return Number.parseFloat(text)
-      } catch {
-        return undefined
-      }
+      return trimToNumber(tesseractResult.data.text)
     }
   },
   dueDate: {
@@ -100,6 +93,8 @@ export async function extractEnbridgeBillData(
   enbridgePdfPath: string
 ): Promise<EnbridgeData> {
   const data = await extractData([enbridgePdfPath], enbridgeDataExtractOptions)
+
   data.usageUnit = 'm3'
+
   return data
 }

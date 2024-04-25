@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises'
 
+import Debug from 'debug'
+import type Tesseract from 'tesseract.js'
 import { createWorker } from 'tesseract.js'
 
 import type { DataExtractOptions } from './extracts/types.js'
@@ -8,6 +10,8 @@ import {
   pdfFilePathToImageFilePaths,
   percentageToCoordinate
 } from './utilities.js'
+
+const debug = Debug('bill-data-extract:index')
 
 /**
  * Extracts data from a series of files.
@@ -74,24 +78,37 @@ export async function extractData<T extends Record<string, unknown>>(
         image.height as number
       )
 
+      const rectangle: Tesseract.Rectangle = {
+        top: yTop,
+        left: xTop,
+        width: xBottom - xTop,
+        height: yBottom - yTop
+      }
+
+      debug(`Finding "${dataFieldName}"...`)
+
       const rawText = await worker.recognize(image.path, {
-        rectangle: {
-          top: yTop,
-          left: xTop,
-          width: xBottom - xTop,
-          height: yBottom - yTop
-        }
+        rectangle
       })
+
+      debug(`Raw Text: ${rawText.data.text}`)
 
       // eslint-disable-next-line security/detect-object-injection
       result[dataFieldName] =
         dataFieldOptions.processingFunction === undefined
           ? rawText.data.text.trim()
           : dataFieldOptions.processingFunction(rawText)
+
+      // eslint-disable-next-line security/detect-object-injection
+      debug(`${dataFieldName}: ${result[dataFieldName]}`)
     }
   } finally {
     await worker.terminate()
   }
+
+  /*
+   * Clean up temp files
+   */
 
   for (const tempFilePath of tempFilePaths) {
     try {

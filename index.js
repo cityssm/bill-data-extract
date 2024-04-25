@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
+import Debug from 'debug';
 import { createWorker } from 'tesseract.js';
 import { imageFilePathsToImageFiles, pdfFilePathToImageFilePaths, percentageToCoordinate } from './utilities.js';
+const debug = Debug('bill-data-extract:index');
 export async function extractData(pdfOrImageFilePaths, extractOptions) {
     const imageFilePaths = [];
     const tempFilePaths = [];
@@ -24,18 +26,22 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
             const yTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate.yPercentage, image.height);
             const xBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate.xPercentage, image.width);
             const yBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate.yPercentage, image.height);
+            const rectangle = {
+                top: yTop,
+                left: xTop,
+                width: xBottom - xTop,
+                height: yBottom - yTop
+            };
+            debug(`Finding "${dataFieldName}"...`);
             const rawText = await worker.recognize(image.path, {
-                rectangle: {
-                    top: yTop,
-                    left: xTop,
-                    width: xBottom - xTop,
-                    height: yBottom - yTop
-                }
+                rectangle
             });
+            debug(`Raw Text: ${rawText.data.text}`);
             result[dataFieldName] =
                 dataFieldOptions.processingFunction === undefined
                     ? rawText.data.text.trim()
                     : dataFieldOptions.processingFunction(rawText);
+            debug(`${dataFieldName}: ${result[dataFieldName]}`);
         }
     }
     finally {
