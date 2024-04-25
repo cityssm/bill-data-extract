@@ -12,6 +12,11 @@ export function trimToNumber(rawText: string): number | undefined {
   return cleanNumberText(text)
 }
 
+/**
+ * Cleans a string representing a number, returning a number if possible.
+ * @param {string} numberText - Text that represents a number.
+ * @returns {number | undefined} - A clean number, or undefined.
+ */
 export function cleanNumberText(numberText: string): number | undefined {
   const text = numberText.replace(',', '')
 
