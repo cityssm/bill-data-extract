@@ -20,22 +20,6 @@ const enbridgeDataExtractOptions = {
             return text;
         }
     },
-    usage: {
-        pageNumber: 1,
-        topLeftCoordinate: {
-            xPercentage: 50.5,
-            yPercentage: 46
-        },
-        bottomRightCoordinate: {
-            xPercentage: 68,
-            yPercentage: 49
-        },
-        processingFunction(tesseractResult) {
-            const textPieces = tesseractResult.data.text.trim().split('\n');
-            const text = textPieces.at(-1) ?? '';
-            return trimToNumber(text);
-        }
-    },
     totalAmountDue: {
         pageNumber: 1,
         topLeftCoordinate: {
@@ -66,10 +50,26 @@ const enbridgeDataExtractOptions = {
             text = textPieces.at(-1) ?? '';
             return text;
         }
+    },
+    gasUsage: {
+        pageNumber: 1,
+        topLeftCoordinate: {
+            xPercentage: 50.5,
+            yPercentage: 46
+        },
+        bottomRightCoordinate: {
+            xPercentage: 68,
+            yPercentage: 49
+        },
+        processingFunction(tesseractResult) {
+            const textPieces = tesseractResult.data.text.trim().split('\n');
+            const text = textPieces.at(-1) ?? '';
+            return trimToNumber(text);
+        }
     }
 };
 export async function extractEnbridgeBillData(enbridgePdfPath) {
     const data = await extractData([enbridgePdfPath], enbridgeDataExtractOptions);
-    data.usageUnit = 'm3';
+    data.gasUsageUnit = 'm3';
     return data;
 }
