@@ -1,6 +1,6 @@
 {
   "name": "@cityssm/bill-data-extract",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.0",
   "type": "module",
   "description": "Extracts data from scanned bill documents into usable details.",
   "exports": {
