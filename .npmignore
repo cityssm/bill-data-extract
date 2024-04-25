@@ -5,6 +5,7 @@ node_modules
 test
 
 .codeclimate.yml
+.deepsource.toml
 .eslintignore
 .eslintrc.json
 .gitignore
@@ -12,3 +13,5 @@ test
 .prettierignore
 .prettierrc.json
 tsconfig.json
+
+*.traineddata
