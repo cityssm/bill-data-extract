@@ -105,9 +105,9 @@ const ssmpucDataExtractOptions = {
 function extractLastNumberInRow(meterType, tesseractResult) {
     const textRows = tesseractResult.data.text.trim().split('\n');
     for (const textRow of textRows) {
-        if (textRow.trim().startsWith(meterType)) {
+        if (textRow.trim().startsWith(`${meterType} `)) {
             const textPieces = textRow.trim().split(' ');
-            return cleanNumberText(textPieces.at(-1) ?? '');
+            return cleanNumberText(textPieces.at(-1) ?? '', false);
         }
     }
     return undefined;

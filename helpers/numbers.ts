@@ -3,26 +3,39 @@ import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmers.js'
 /**
  * Extracts a number from a text string.
  * @param {string} rawText - Raw text string.
+ * @param {boolean} isMoneyWithTwoDecimalPlaces - Whether or not there should be two decimal places.
  * @returns {number} - Extracted number.
  */
-export function trimToNumber(rawText: string): number | undefined {
+export function trimToNumber(
+  rawText: string,
+  isMoneyWithTwoDecimalPlaces: boolean = true
+): number | undefined {
   let text = rawText.trim()
   text = trimTextFromStartUntil(text, /\d/)
   text = trimTextFromEndUntil(text, /\d/)
-  return cleanNumberText(text)
+  return cleanNumberText(text, isMoneyWithTwoDecimalPlaces)
 }
 
 /**
  * Cleans a string representing a number, returning a number if possible.
  * @param {string} numberText - Text that represents a number.
+ * @param {boolean} isMoneyWithTwoDecimalPlaces - Whether or not there should be two decimal places.
  * @returns {number | undefined} - A clean number, or undefined.
  */
-export function cleanNumberText(numberText: string): number | undefined {
-  const text = numberText.replace(',', '')
+export function cleanNumberText(
+  numberText: string,
+  isMoneyWithTwoDecimalPlaces: boolean
+): number | undefined {
+  const text = numberText.replaceAll(',', '').replaceAll(' ', '')
 
-  try {
-    return Number.parseFloat(text)
-  } catch {
+  const float = Number.parseFloat(text)
+
+  if (Number.isNaN(float)) {
+    console.log(`PARSING ERROR: ${text}`)
     return undefined
+  } else if (isMoneyWithTwoDecimalPlaces) {
+    return Number.parseFloat(text.replaceAll('.', '')) / 100
   }
+
+  return float
 }

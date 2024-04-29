@@ -1,6 +1,6 @@
 {
   "name": "@cityssm/bill-data-extract",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-alpha.1",
   "type": "module",
   "description": "Extracts data from scanned bill documents into usable details.",
   "exports": {
@@ -19,7 +19,8 @@
   "keywords": [
     "pdf",
     "ocr",
-    "tesseract"
+    "tesseract",
+    "sault-ste-marie"
   ],
   "author": "The Corporation of the City of Sault Ste. Marie",
   "license": "MIT",

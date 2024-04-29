@@ -16,7 +16,7 @@ await describe('bill-data-extract/enbridge', async () => {
 });
 await describe('bill-data-extract/ssmpuc', async () => {
     await it('Extracts data from a scanned PUC bill', async () => {
-        const data = await extractSSMPUCBillData('test/files/ssmpucScanned.pdf');
+        const data = await extractSSMPUCBillData('test/files/ssmpucScanned2.pdf');
         console.log(data);
         assert.ok(data);
     });

@@ -1,16 +1,19 @@
 import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmers.js';
-export function trimToNumber(rawText) {
+export function trimToNumber(rawText, isMoneyWithTwoDecimalPlaces = true) {
     let text = rawText.trim();
     text = trimTextFromStartUntil(text, /\d/);
     text = trimTextFromEndUntil(text, /\d/);
-    return cleanNumberText(text);
+    return cleanNumberText(text, isMoneyWithTwoDecimalPlaces);
 }
-export function cleanNumberText(numberText) {
-    const text = numberText.replace(',', '');
-    try {
-        return Number.parseFloat(text);
-    }
-    catch {
+export function cleanNumberText(numberText, isMoneyWithTwoDecimalPlaces) {
+    const text = numberText.replaceAll(',', '').replaceAll(' ', '');
+    const float = Number.parseFloat(text);
+    if (Number.isNaN(float)) {
+        console.log(`PARSING ERROR: ${text}`);
         return undefined;
     }
+    else if (isMoneyWithTwoDecimalPlaces) {
+        return Number.parseFloat(text.replaceAll('.', '')) / 100;
+    }
+    return float;
 }
