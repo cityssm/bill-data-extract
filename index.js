@@ -3,6 +3,9 @@ import Debug from 'debug';
 import { createWorker } from 'tesseract.js';
 import { imageFilePathsToImageFiles, pdfFilePathToImageFilePaths, percentageToCoordinate } from './utilities.js';
 const debug = Debug('bill-data-extract:index');
+function getOCRCacheKey(options) {
+    return `${options.imagePath}::${options.pageNumber}::${options.xTop}::${options.yTop}::${options.xBottom}::${options.yBottom}`;
+}
 export async function extractData(pdfOrImageFilePaths, extractOptions) {
     const imageFilePaths = [];
     const tempFilePaths = [];
@@ -17,6 +20,7 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
         }
     }
     const imageFiles = imageFilePathsToImageFiles(imageFilePaths);
+    const ocrCache = {};
     const result = {};
     const worker = await createWorker();
     try {
@@ -33,9 +37,24 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
                 height: yBottom - yTop
             };
             debug(`Finding "${dataFieldName}"...`);
-            const rawText = await worker.recognize(image.path, {
-                rectangle
+            const ocrCacheKey = getOCRCacheKey({
+                imagePath: image.path,
+                pageNumber: dataFieldOptions.pageNumber,
+                xTop,
+                yTop,
+                xBottom,
+                yBottom
             });
+            let rawText = ocrCache[ocrCacheKey];
+            if (rawText === undefined) {
+                rawText = await worker.recognize(image.path, {
+                    rectangle
+                });
+                ocrCache[ocrCacheKey] = rawText;
+            }
+            else {
+                debug(`OCR Cache Hit: ${ocrCacheKey}`);
+            }
             debug(`Raw Text: ${rawText.data.text}`);
             result[dataFieldName] =
                 dataFieldOptions.processingFunction === undefined

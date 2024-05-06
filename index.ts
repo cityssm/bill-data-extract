@@ -13,6 +13,17 @@ import {
 
 const debug = Debug('bill-data-extract:index')
 
+function getOCRCacheKey(options: {
+  imagePath: string
+  pageNumber: number
+  xTop: number
+  yTop: number
+  xBottom: number
+  yBottom: number
+}): string {
+  return `${options.imagePath}::${options.pageNumber}::${options.xTop}::${options.yTop}::${options.xBottom}::${options.yBottom}`
+}
+
 /**
  * Extracts data from a series of files.
  * @param {string[]} pdfOrImageFilePaths - A list of paths to PDFs or images that represent a single bill.
@@ -51,6 +62,8 @@ export async function extractData<T extends Record<string, unknown>>(
    * Extract data
    */
 
+  const ocrCache: Record<string, Tesseract.RecognizeResult> = {}
+
   const result = {}
   const worker = await createWorker()
 
@@ -87,9 +100,28 @@ export async function extractData<T extends Record<string, unknown>>(
 
       debug(`Finding "${dataFieldName}"...`)
 
-      const rawText = await worker.recognize(image.path, {
-        rectangle
+      const ocrCacheKey = getOCRCacheKey({
+        imagePath: image.path,
+        pageNumber: dataFieldOptions.pageNumber,
+        xTop,
+        yTop,
+        xBottom,
+        yBottom
       })
+
+      // eslint-disable-next-line security/detect-object-injection
+      let rawText = ocrCache[ocrCacheKey]
+
+      if (rawText === undefined) {
+        rawText = await worker.recognize(image.path, {
+          rectangle
+        })
+
+        // eslint-disable-next-line security/detect-object-injection
+        ocrCache[ocrCacheKey] = rawText
+      } else {
+        debug(`OCR Cache Hit: ${ocrCacheKey}`)
+      }
 
       debug(`Raw Text: ${rawText.data.text}`)
 
