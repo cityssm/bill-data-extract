@@ -26,10 +26,10 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
     try {
         for (const [dataFieldName, dataFieldOptions] of Object.entries(extractOptions)) {
             const image = imageFiles[dataFieldOptions.pageNumber - 1];
-            const xTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate.xPercentage, image.width);
-            const yTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate.yPercentage, image.height);
-            const xBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate.xPercentage, image.width);
-            const yBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate.yPercentage, image.height);
+            const xTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate?.xPercentage ?? 0, image.width);
+            const yTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate?.yPercentage ?? 0, image.height);
+            const xBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate?.xPercentage ?? 100, image.width);
+            const yBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate?.yPercentage ?? 100, image.height);
             const rectangle = {
                 top: yTop,
                 left: xTop,

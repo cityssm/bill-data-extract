@@ -4,8 +4,13 @@ export type DataExtractOptions<T> = Record<keyof T, DataField>
 
 export interface DataField {
   pageNumber: number
-  topLeftCoordinate: DataFieldCoordinate
-  bottomRightCoordinate: DataFieldCoordinate
+
+  /** Default {0, 0} */
+  topLeftCoordinate?: DataFieldCoordinate
+
+  /** Default {100, 100} */
+  bottomRightCoordinate?: DataFieldCoordinate
+
   processingFunction?: (
     tesseractResult: TesseractRecognizeResult
   ) => unknown | undefined

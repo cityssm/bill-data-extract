@@ -74,20 +74,20 @@ export async function extractData<T extends Record<string, unknown>>(
       const image = imageFiles[dataFieldOptions.pageNumber - 1]
 
       const xTop = percentageToCoordinate(
-        dataFieldOptions.topLeftCoordinate.xPercentage,
+        dataFieldOptions.topLeftCoordinate?.xPercentage ?? 0,
         image.width as number
       )
       const yTop = percentageToCoordinate(
-        dataFieldOptions.topLeftCoordinate.yPercentage,
+        dataFieldOptions.topLeftCoordinate?.yPercentage ?? 0,
         image.height as number
       )
 
       const xBottom = percentageToCoordinate(
-        dataFieldOptions.bottomRightCoordinate.xPercentage,
+        dataFieldOptions.bottomRightCoordinate?.xPercentage ?? 100,
         image.width as number
       )
       const yBottom = percentageToCoordinate(
-        dataFieldOptions.bottomRightCoordinate.yPercentage,
+        dataFieldOptions.bottomRightCoordinate?.yPercentage ?? 100,
         image.height as number
       )
 
