@@ -18,7 +18,7 @@ export async function pdfFilePathToImageFilePaths(
   const imageFilePaths: string[] = []
 
   const images = await convertPdfToImage(pdfFilePath, {
-    scale: 2
+    scale: 3
   })
 
   for (const image of images) {

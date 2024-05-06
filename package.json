@@ -6,10 +6,12 @@
   "exports": {
     ".": "./index.js",
     "./enbridge.js": "./extracts/enbridge.js",
+    "./sectorflow.js": "./extracts/sectorflow.js",
     "./ssmpuc.js": "./extracts/ssmpuc.js"
   },
   "scripts": {
     "test": "cross-env DEBUG=bill-data-extract:* node --test",
+    "test:noOutput": "node --test",
     "coverage": "cross-env DEBUG=bill-data-extract:* c8 --reporter=lcov --reporter=text --reporter=text-summary node --test"
   },
   "repository": {
@@ -30,10 +32,11 @@
   "homepage": "https://github.com/cityssm/bill-data-extract#readme",
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.12.7",
-    "eslint-config-cityssm": "^1.7.0"
+    "@types/node": "^20.12.10",
+    "eslint-config-cityssm": "^2.0.1"
   },
   "dependencies": {
+    "@cityssm/sectorflow": "^0.3.0",
     "debug": "^4.3.4",
     "image-size": "^1.1.1",
     "pdf-img-convert": "^1.2.1",

@@ -7,7 +7,7 @@ import { convert as convertPdfToImage } from 'pdf-img-convert';
 export async function pdfFilePathToImageFilePaths(pdfFilePath) {
     const imageFilePaths = [];
     const images = await convertPdfToImage(pdfFilePath, {
-        scale: 2
+        scale: 3
     });
     for (const image of images) {
         const fileName = `billDataExtract_${randomUUID()}.png`;

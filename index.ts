@@ -24,6 +24,7 @@ function getOCRCacheKey(options: {
   return `${options.imagePath}::${options.pageNumber}::${options.xTop}::${options.yTop}::${options.xBottom}::${options.yBottom}`
 }
 
+// eslint-disable-next-line no-secrets/no-secrets
 /**
  * Extracts data from a series of files.
  * @param {string[]} pdfOrImageFilePaths - A list of paths to PDFs or images that represent a single bill.
