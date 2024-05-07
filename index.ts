@@ -155,4 +155,10 @@ export async function extractData<T extends Record<string, unknown>>(
   return result as T
 }
 
-export type { DataExtractOptions, DataField } from './extracts/types.js'
+export type {
+  BillData,
+  DataExtractOptions,
+  DataField,
+  DataFieldCoordinate,
+  GasBillData
+} from './extracts/types.js'
