@@ -1,5 +1,6 @@
 import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmers.js'
 
+// eslint-disable-next-line no-secrets/no-secrets
 /**
  * Extracts a number from a text string.
  * @param {string} rawText - Raw text string.
@@ -16,6 +17,7 @@ export function trimToNumber(
   return cleanNumberText(text, isMoneyWithTwoDecimalPlaces)
 }
 
+// eslint-disable-next-line no-secrets/no-secrets
 /**
  * Cleans a string representing a number, returning a number if possible.
  * @param {string} numberText - Text that represents a number.

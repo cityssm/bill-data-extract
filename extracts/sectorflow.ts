@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
 import { SectorFlow } from '@cityssm/sectorflow'
 
 import { extractData } from '../index.js'
