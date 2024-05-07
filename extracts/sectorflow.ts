@@ -69,7 +69,7 @@ export async function extractBillDataWithSectorFlow(
 
   const sectorFlow = new SectorFlow(sectorFlowApiKey)
 
-  let modelId: string = ''
+  let modelId = ''
 
   for (const preferredModel of preferredModels) {
     modelId = (await sectorFlow.getModelIdByKeywords(preferredModel)) ?? ''
