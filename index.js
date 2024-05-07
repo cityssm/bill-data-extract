@@ -25,7 +25,7 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
     const worker = await createWorker();
     try {
         for (const [dataFieldName, dataFieldOptions] of Object.entries(extractOptions)) {
-            const image = imageFiles[dataFieldOptions.pageNumber - 1];
+            const image = imageFiles[(dataFieldOptions.pageNumber ?? 1) - 1];
             const xTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate?.xPercentage ?? 0, image.width);
             const yTop = percentageToCoordinate(dataFieldOptions.topLeftCoordinate?.yPercentage ?? 0, image.height);
             const xBottom = percentageToCoordinate(dataFieldOptions.bottomRightCoordinate?.xPercentage ?? 100, image.width);
@@ -39,7 +39,7 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
             debug(`Finding "${dataFieldName}"...`);
             const ocrCacheKey = getOCRCacheKey({
                 imagePath: image.path,
-                pageNumber: dataFieldOptions.pageNumber,
+                pageNumber: dataFieldOptions.pageNumber ?? 1,
                 xTop,
                 yTop,
                 xBottom,

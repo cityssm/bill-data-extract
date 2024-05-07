@@ -72,7 +72,7 @@ export async function extractData<T extends Record<string, unknown>>(
     for (const [dataFieldName, dataFieldOptions] of Object.entries(
       extractOptions
     )) {
-      const image = imageFiles[dataFieldOptions.pageNumber - 1]
+      const image = imageFiles[(dataFieldOptions.pageNumber ?? 1) - 1]
 
       const xTop = percentageToCoordinate(
         dataFieldOptions.topLeftCoordinate?.xPercentage ?? 0,
@@ -103,7 +103,7 @@ export async function extractData<T extends Record<string, unknown>>(
 
       const ocrCacheKey = getOCRCacheKey({
         imagePath: image.path,
-        pageNumber: dataFieldOptions.pageNumber,
+        pageNumber: dataFieldOptions.pageNumber ?? 1,
         xTop,
         yTop,
         xBottom,

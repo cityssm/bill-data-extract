@@ -4,7 +4,7 @@ export type DataExtractOptions<T> = Record<keyof T, DataField>
 
 export interface DataField {
   /** The first page number is 1. */
-  pageNumber: number
+  pageNumber?: number
 
   /** Default {0, 0} */
   topLeftCoordinate?: DataFieldCoordinate
