@@ -9,11 +9,26 @@ const ssmpucDataExtractOptions = {
         },
         bottomRightCoordinate: {
             xPercentage: 95,
-            yPercentage: 8
+            yPercentage: 9
         },
         processingFunction(tesseractResult) {
             const textPieces = tesseractResult.data.text.trim().split('\n');
             return textPieces.at(-1) ?? '';
+        }
+    },
+    serviceAddress: {
+        pageNumber: 1,
+        topLeftCoordinate: {
+            xPercentage: 54.6,
+            yPercentage: 10.7
+        },
+        bottomRightCoordinate: {
+            xPercentage: 80.8,
+            yPercentage: 16.5
+        },
+        processingFunction(tesseractResult) {
+            const textPieces = tesseractResult.data.text.trim().split('\n');
+            return (textPieces.at(-1) ?? '').trim();
         }
     },
     totalAmountDue: {
@@ -37,7 +52,7 @@ const ssmpucDataExtractOptions = {
             yPercentage: 87.75
         },
         bottomRightCoordinate: {
-            xPercentage: 60,
+            xPercentage: 61,
             yPercentage: 91
         },
         processingFunction(tesseractResult) {
