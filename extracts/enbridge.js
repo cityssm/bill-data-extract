@@ -9,13 +9,14 @@ const enbridgeDataExtractOptions = {
             yPercentage: 21
         },
         bottomRightCoordinate: {
-            xPercentage: 63.5,
+            xPercentage: 65,
             yPercentage: 24
         },
         processingFunction(tesseractResult) {
             const textPieces = tesseractResult.data.text.trim().split('\n');
             let text = textPieces.at(-1) ?? '';
             text = text.replaceAll(' ', '');
+            text = text.replaceAll(':', '2');
             text = text.replaceAll(';', '2');
             text = text.replaceAll('¢', '6');
             return text;

@@ -12,7 +12,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
       yPercentage: 21
     },
     bottomRightCoordinate: {
-      xPercentage: 63.5,
+      xPercentage: 65,
       yPercentage: 24
     },
     processingFunction(tesseractResult): string {
@@ -20,6 +20,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
       let text = textPieces.at(-1) ?? ''
 
       text = text.replaceAll(' ', '')
+      text = text.replaceAll(':', '2')
       text = text.replaceAll(';', '2')
       text = text.replaceAll('¢', '6')
 
