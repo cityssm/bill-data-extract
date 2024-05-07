@@ -1,5 +1,8 @@
 # Bill Data Extract
 
+[![npm (scoped)](https://img.shields.io/npm/v/%40cityssm/bill-data-extract)](https://www.npmjs.com/package/@cityssm/bill-data-extract)
+[![DeepSource](https://app.deepsource.com/gh/cityssm/bill-data-extract.svg/?label=active+issues&show_trend=true&token=yOE-jaj4mEuAieY_Jemi9vEq)](https://app.deepsource.com/gh/cityssm/bill-data-extract/)
+
 Extract data from scanned bill documents into usable details.
 
 ## Supported Bills
