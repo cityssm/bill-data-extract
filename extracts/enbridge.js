@@ -9,15 +9,31 @@ const enbridgeDataExtractOptions = {
             yPercentage: 21
         },
         bottomRightCoordinate: {
-            xPercentage: 63,
+            xPercentage: 63.5,
             yPercentage: 24
         },
         processingFunction(tesseractResult) {
             const textPieces = tesseractResult.data.text.trim().split('\n');
             let text = textPieces.at(-1) ?? '';
             text = text.replaceAll(' ', '');
+            text = text.replaceAll(';', '2');
             text = text.replaceAll('¢', '6');
             return text;
+        }
+    },
+    serviceAddress: {
+        pageNumber: 1,
+        topLeftCoordinate: {
+            xPercentage: 52,
+            yPercentage: 15
+        },
+        bottomRightCoordinate: {
+            xPercentage: 93,
+            yPercentage: 21
+        },
+        processingFunction(tesseractResult) {
+            const textLines = tesseractResult.data.text.trim().split('\n');
+            return (textLines[1] ?? '').trim().replaceAll('  ', ' ');
         }
     },
     totalAmountDue: {

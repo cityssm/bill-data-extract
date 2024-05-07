@@ -1,5 +1,6 @@
 import type { BillData } from './types.js';
 export interface EnbridgeData extends BillData {
+    serviceAddress: string;
     gasUsage: number;
     gasUsageUnit: 'm3';
 }

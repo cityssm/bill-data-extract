@@ -12,7 +12,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
       yPercentage: 21
     },
     bottomRightCoordinate: {
-      xPercentage: 63,
+      xPercentage: 63.5,
       yPercentage: 24
     },
     processingFunction(tesseractResult): string {
@@ -20,9 +20,25 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
       let text = textPieces.at(-1) ?? ''
 
       text = text.replaceAll(' ', '')
+      text = text.replaceAll(';', '2')
       text = text.replaceAll('¢', '6')
 
       return text
+    }
+  },
+  serviceAddress: {
+    pageNumber: 1,
+    topLeftCoordinate: {
+      xPercentage: 52,
+      yPercentage: 15
+    },
+    bottomRightCoordinate: {
+      xPercentage: 93,
+      yPercentage: 21
+    },
+    processingFunction(tesseractResult) {
+      const textLines = tesseractResult.data.text.trim().split('\n')
+      return (textLines[1] ?? '').trim().replaceAll('  ', ' ')
     }
   },
   totalAmountDue: {
@@ -85,6 +101,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
 }
 
 export interface EnbridgeData extends BillData {
+  serviceAddress: string
   gasUsage: number
   gasUsageUnit: 'm3'
 }
