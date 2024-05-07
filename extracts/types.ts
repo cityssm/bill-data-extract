@@ -31,6 +31,12 @@ export interface DataFieldCoordinate {
 
 export interface BillData extends Record<string, unknown> {
   accountNumber: string
+  serviceAddress: string
   totalAmountDue: number | undefined
   dueDate: string
+}
+
+export interface GasBillData extends BillData {
+  gasUsage: number
+  gasUsageUnit: 'm3'
 }

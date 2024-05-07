@@ -2,9 +2,9 @@ import { trimToNumber } from '../helpers/numbers.js'
 import { trimTextFromEndUntil } from '../helpers/trimmers.js'
 import { extractData } from '../index.js'
 
-import type { BillData, DataExtractOptions } from './types.js'
+import type { DataExtractOptions, GasBillData } from './types.js'
 
-const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
+const enbridgeDataExtractOptions: DataExtractOptions<GasBillData> = {
   accountNumber: {
     pageNumber: 1,
     topLeftCoordinate: {
@@ -101,20 +101,14 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
   }
 }
 
-export interface EnbridgeData extends BillData {
-  serviceAddress: string
-  gasUsage: number
-  gasUsageUnit: 'm3'
-}
-
 /**
  * Extracts data from an Enbridge gas bill.
  * @param {string} enbridgePdfPath - Path to an Enbridge bill.
- * @returns {Promise<EnbridgeData>} - Enbridge bill data.
+ * @returns {Promise<GasBillData>} - Enbridge bill data.
  */
 export async function extractEnbridgeBillData(
   enbridgePdfPath: string
-): Promise<EnbridgeData> {
+): Promise<GasBillData> {
   const data = await extractData([enbridgePdfPath], enbridgeDataExtractOptions)
 
   data.gasUsageUnit = 'm3'
