@@ -62,17 +62,24 @@ const enbridgeDataExtractOptions: DataExtractOptions<EnbridgeData> = {
   gasUsage: {
     pageNumber: 1,
     topLeftCoordinate: {
-      xPercentage: 50.5,
-      yPercentage: 46
+      xPercentage: 50,
+      yPercentage: 43
     },
     bottomRightCoordinate: {
-      xPercentage: 68,
-      yPercentage: 49
+      xPercentage: 69,
+      yPercentage: 52
     },
     processingFunction(tesseractResult) {
-      const textPieces = tesseractResult.data.text.trim().split('\n')
-      const text = textPieces.at(-1) ?? ''
-      return trimToNumber(text)
+      const textLines = tesseractResult.data.text.trim().split('\n')
+
+      for (const textLine of textLines) {
+        if (/\d/.test(textLine)) {
+          return trimToNumber(textLine, false)
+        }
+      }
+
+      // eslint-disable-next-line unicorn/no-useless-undefined
+      return undefined
     }
   }
 }
