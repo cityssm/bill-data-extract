@@ -1,5 +1,12 @@
+import { SectorFlow } from '@cityssm/sectorflow';
+import { dateToString } from '@cityssm/utils-datetime';
+import { parse } from 'date-fns/parse';
+import Debug from 'debug';
 import { cleanNumberText, trimToNumber } from '../helpers/numbers.js';
 import { extractData } from '../index.js';
+import { replaceDateStringTypos } from '../utilities/dateUtilities.js';
+import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
+const debug = Debug('bill-data-extract:ssmpuc');
 const ssmpucDataExtractOptions = {
     accountNumber: {
         pageNumber: 1,
@@ -57,7 +64,9 @@ const ssmpucDataExtractOptions = {
         },
         processingFunction(tesseractResult) {
             const textPieces = tesseractResult.data.text.trim().split('\n');
-            return textPieces.at(-1) ?? '';
+            const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '');
+            const date = parse(dateString, 'LLL dd y', new Date());
+            return dateToString(date);
         }
     },
     electricityUsageMetered: {
@@ -81,7 +90,7 @@ const ssmpucDataExtractOptions = {
             yPercentage: 36.5
         },
         bottomRightCoordinate: {
-            xPercentage: 85,
+            xPercentage: 85.5,
             yPercentage: 47
         },
         processingFunction(tesseractResult) {
@@ -132,4 +141,62 @@ export async function extractSSMPUCBillData(ssmpucBillPath) {
     data.waterUsageUnit = 'm3';
     data.electricityUsageUnit = 'kWh';
     return data;
+}
+export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey) {
+    const rawData = await extractData([ssmpucBillPath], {
+        text: {}
+    });
+    const sectorFlow = new SectorFlow(sectorFlowApiKey);
+    const projectId = await getTemporaryProjectId(sectorFlow);
+    const response = await sectorFlow.sendChatMessage(projectId, `Given the following text, extract
+    the "Account Number" as "accountNumber",
+    the "Service Address" as "serviceAddress",
+    the electric metered usage as "electricityUsageMetered",
+    the electric billed usage as "electricityUsageBilled",
+    the water metered usage as "waterUsageMetered",
+    the water billed usage as "waterUsageBilled",
+    the "Amount Due" as "totalAmountDue",
+    and the "Due Date" as "dueDate"
+    into a JSON object.
+    The "accountNumber" is a text string with 7 digits, a dash, and two more digits.
+    The "dueDate" should be formatted as "yyyy-mm-dd".
+    The "totalAmountDue", 
+    "electricityUsageMetered", "electricityUsageBilled",
+    "waterUsageMetered", "waterUsageBilled",
+    and "totalAmountDue" should be formatted as numbers.
+
+    The "electricityUsageBilled" is in a row of text starting with the letter "E".
+    The "electricityUsageBilled" is the number right before "kWh"
+    and is greater than or equal to the "electricityUsageMetered".
+    
+    The "electricityUsageMetered" is the sum of first numbers after "Off Peak Winter", "Mid Peak Winter", and "On Peak Winter" usage
+    and is equal to a number next to the "electricityUsageBilled".
+    
+    The "waterUsageMetered" and "waterUsageBilled" are in a row of text starting with the letter "W".
+    The "waterUsageBilled" is the number right before "cu.metre",
+    The "waterUsageMetered" and "waterUsageBilled" are equal.
+    If there is no value for "Water Consumption", the "waterUsageMetered" and the "waterUsageBilled" should be 0.
+    
+    ${rawData.text}`);
+    const json = JSON.parse(response.choices[0].choices[0].message.content);
+    await sectorFlow.deleteProject(projectId);
+    json.waterUsageUnit = 'm3';
+    json.electricityUsageUnit = 'kWh';
+    return json;
+}
+export async function extractSSMPUCBillDataWithSectorFlowBackup(ssmpucBillPath, sectorFlowApiKey) {
+    let billData;
+    try {
+        billData = await extractSSMPUCBillData(ssmpucBillPath);
+    }
+    catch { }
+    if (billData === undefined ||
+        !/^\d{7}/.test(billData.accountNumber) ||
+        (billData.electricityUsageMetered ?? 0) >
+            (billData.electricityUsageBilled ?? 0) ||
+        (billData.waterUsageMetered ?? 0) > (billData.waterUsageBilled ?? 0)) {
+        debug('Falling back to SectorFlow');
+        billData = await extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey);
+    }
+    return billData;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@cityssm/bill-data-extract",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.5",
   "type": "module",
   "description": "Extracts data from scanned bill documents into usable details.",
   "exports": {
@@ -40,6 +40,8 @@
   },
   "dependencies": {
     "@cityssm/sectorflow": "^0.3.0",
+    "@cityssm/utils-datetime": "^1.1.2",
+    "date-fns": "^3.6.0",
     "debug": "^4.3.4",
     "image-size": "^1.1.1",
     "pdf-img-convert": "^1.2.1",

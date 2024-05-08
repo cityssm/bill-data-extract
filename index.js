@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import Debug from 'debug';
 import { createWorker } from 'tesseract.js';
-import { imageFilePathsToImageFiles, pdfFilePathToImageFilePaths, percentageToCoordinate } from './utilities.js';
+import { imageFilePathsToImageFiles, pdfFilePathToImageFilePaths } from './utilities/imageUtilities.js';
+import { percentageToCoordinate } from './utilities/mathUtilities.js';
 const debug = Debug('bill-data-extract:index');
 function getOCRCacheKey(options) {
     return `${options.imagePath}::${options.pageNumber}::${options.xTop}::${options.yTop}::${options.xBottom}::${options.yBottom}`;

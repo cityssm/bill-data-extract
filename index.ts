@@ -7,9 +7,9 @@ import { createWorker } from 'tesseract.js'
 import type { DataExtractOptions } from './extracts/types.js'
 import {
   imageFilePathsToImageFiles,
-  pdfFilePathToImageFilePaths,
-  percentageToCoordinate
-} from './utilities.js'
+  pdfFilePathToImageFilePaths
+} from './utilities/imageUtilities.js'
+import { percentageToCoordinate } from './utilities/mathUtilities.js'
 
 const debug = Debug('bill-data-extract:index')
 

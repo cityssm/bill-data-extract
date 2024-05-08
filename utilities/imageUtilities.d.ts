@@ -4,5 +4,4 @@ type ImageFileDetails = ISizeCalculationResult & {
     path: string;
 };
 export declare function imageFilePathsToImageFiles(imageFilePaths: string[]): ImageFileDetails[];
-export declare function percentageToCoordinate(percentage: number, length: number): number;
 export {};

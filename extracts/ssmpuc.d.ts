@@ -8,3 +8,5 @@ export interface SSMPUCData extends BillData {
     electricityUsageUnit: 'kWh';
 }
 export declare function extractSSMPUCBillData(ssmpucBillPath: string): Promise<SSMPUCData>;
+export declare function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath: string, sectorFlowApiKey: string): Promise<SSMPUCData>;
+export declare function extractSSMPUCBillDataWithSectorFlowBackup(ssmpucBillPath: string, sectorFlowApiKey: string): Promise<SSMPUCData | undefined>;

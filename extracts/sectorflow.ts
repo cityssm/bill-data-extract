@@ -4,10 +4,9 @@
 import { SectorFlow } from '@cityssm/sectorflow'
 
 import { extractData } from '../index.js'
+import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
 import type { BillData, DataExtractOptions } from './types.js'
-
-const preferredModels = ['ChatGPT']
 
 const sectorFlowPrompt = `Given the following text, extract the "account number" as "accountNumber", the "service address" as "serviceAddress", the "total amount due" as "totalAmountDue", and the "due date" as "dueDate" into a JSON object.
 The "totalAmountDue" should be formatted as a number.
@@ -64,39 +63,15 @@ export async function extractBillDataWithSectorFlow(
   const rawData = await extractData([billPath], sectorFlowDataExtractOptions)
 
   /*
-   * Get model from SectorFlow
+   * Connect to SectorFlow
    */
 
   const sectorFlow = new SectorFlow(sectorFlowApiKey)
 
-  let modelId = ''
-
-  for (const preferredModel of preferredModels) {
-    modelId = (await sectorFlow.getModelIdByKeywords(preferredModel)) ?? ''
-
-    if (modelId !== '') {
-      break
-    }
-  }
-
-  if (modelId === '') {
-    throw new Error('No preferred models available.')
-  }
-
-  /*
-   * Create temp project.
-   */
-
-  const project = await sectorFlow.createProject({
-    modelIds: [modelId],
-    name: `@cityssm/bill-data-extract temp project - ${Date.now()}`,
-    chatHistoryType: 'USER',
-    contextType: 'PRIVATE',
-    sharingType: 'PRIVATE'
-  })
+  const projectId = await getTemporaryProjectId(sectorFlow)
 
   const response = await sectorFlow.sendChatMessage(
-    project.id,
+    projectId,
     `${sectorFlowPrompt}\n\n${rawData.accountNumber ?? ''}`
   )
 
@@ -106,7 +81,7 @@ export async function extractBillDataWithSectorFlow(
    * Clean up project.
    */
 
-  await sectorFlow.deleteProject(project.id)
+  await sectorFlow.deleteProject(projectId)
 
   return json
 }
