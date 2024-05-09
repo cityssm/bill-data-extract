@@ -95,7 +95,7 @@ export async function extractData<T extends Record<string, unknown>>(
       const rectangle: Tesseract.Rectangle = {
         top: yTop,
         left: xTop,
-        width: xBottom - xTop,
+        width: xBottom - xTop - 1,
         height: yBottom - yTop
       }
 

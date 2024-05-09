@@ -34,7 +34,7 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
             const rectangle = {
                 top: yTop,
                 left: xTop,
-                width: xBottom - xTop,
+                width: xBottom - xTop - 1,
                 height: yBottom - yTop
             };
             debug(`Finding "${dataFieldName}"...`);
