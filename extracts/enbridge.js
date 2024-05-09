@@ -19,15 +19,17 @@ const enbridgeDataExtractOptions = {
         },
         bottomRightCoordinate: {
             xPercentage: 65,
-            yPercentage: 24
+            yPercentage: 25
         },
         processingFunction(tesseractResult) {
             const textPieces = tesseractResult.data.text.trim().split('\n');
             let text = textPieces.at(-1) ?? '';
-            text = text.replaceAll(' ', '');
-            text = text.replaceAll(':', '2');
-            text = text.replaceAll(';', '2');
-            text = text.replaceAll('¢', '6');
+            text = text
+                .replaceAll('.', '')
+                .replaceAll(' ', '')
+                .replaceAll(':', '2')
+                .replaceAll(';', '2')
+                .replaceAll('¢', '6');
             return text;
         }
     },
@@ -39,11 +41,21 @@ const enbridgeDataExtractOptions = {
         },
         bottomRightCoordinate: {
             xPercentage: 93,
-            yPercentage: 21
+            yPercentage: 23
         },
         processingFunction(tesseractResult) {
             const textLines = tesseractResult.data.text.trim().split('\n');
-            return (textLines[1] ?? '').trim().replaceAll('  ', ' ');
+            let serviceAddressIndex = 0;
+            for (serviceAddressIndex = 0; serviceAddressIndex <= textLines.length; serviceAddressIndex += 1) {
+                if (textLines[serviceAddressIndex].startsWith('Service')) {
+                    serviceAddressIndex += 1;
+                    if (textLines[serviceAddressIndex].trim() === '') {
+                        serviceAddressIndex += 1;
+                    }
+                    break;
+                }
+            }
+            return (textLines[serviceAddressIndex] ?? '').trim().replaceAll('  ', ' ');
         }
     },
     totalAmountDue: {
@@ -72,9 +84,16 @@ const enbridgeDataExtractOptions = {
         },
         processingFunction(tesseractResult) {
             const textPieces = trimTextFromEndUntil(tesseractResult.data.text.trim(), /\d/).split('\n');
-            const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '');
-            const date = parse(dateString, 'LLL dd, y', new Date());
-            return dateToString(date);
+            const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '')
+                .slice(-12)
+                .trim();
+            try {
+                const date = parse(dateString, 'LLL dd, y', new Date());
+                return dateToString(date);
+            }
+            catch {
+                return dateString;
+            }
         }
     },
     gasUsage: {
