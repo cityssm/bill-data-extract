@@ -189,7 +189,8 @@ export async function extractSSMPUCBillDataWithSectorFlowBackup(ssmpucBillPath, 
     try {
         billData = await extractSSMPUCBillData(ssmpucBillPath);
     }
-    catch { }
+    catch {
+    }
     if (billData === undefined ||
         !/^\d{7}/.test(billData.accountNumber) ||
         (billData.electricityUsage ?? 0) > (billData.electricityUsageBilled ?? 0) ||

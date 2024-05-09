@@ -240,7 +240,9 @@ export async function extractEnbridgeBillDataWithSectorFlowBackup(
 
   try {
     billData = await extractEnbridgeBillData(enbridgeBillPath)
-  } catch {}
+  } catch {
+    // ignore
+  }
 
   if (billData === undefined || !/^\d{12}/.test(billData.accountNumber)) {
     debug('Falling back to SectorFlow')

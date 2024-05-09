@@ -257,7 +257,9 @@ export async function extractSSMPUCBillDataWithSectorFlowBackup(
 
   try {
     billData = await extractSSMPUCBillData(ssmpucBillPath)
-  } catch {}
+  } catch {
+    // ignore
+  }
 
   if (
     billData === undefined ||
