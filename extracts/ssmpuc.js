@@ -162,8 +162,8 @@ export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sector
     The "dueDate" should be formatted as "yyyy-mm-dd".
     The "totalAmountDue", 
     "electricityUsage", "electricityUsageBilled",
-    "waterUsage", "waterUsageBilled",
-    and "totalAmountDue" should be formatted as numbers.
+    "waterUsage", and "waterUsageBilled",
+    should be formatted as numbers.
 
     The "electricityUsageBilled" is in a row of text starting with the letter "E".
     The "electricityUsageBilled" is the number right before "kWh"

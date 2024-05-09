@@ -211,8 +211,8 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     The "dueDate" should be formatted as "yyyy-mm-dd".
     The "totalAmountDue", 
     "electricityUsage", "electricityUsageBilled",
-    "waterUsage", "waterUsageBilled",
-    and "totalAmountDue" should be formatted as numbers.
+    "waterUsage", and "waterUsageBilled",
+    should be formatted as numbers.
 
     The "electricityUsageBilled" is in a row of text starting with the letter "E".
     The "electricityUsageBilled" is the number right before "kWh"
@@ -229,7 +229,7 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     ${rawText}`
   )
 
-  const json = JSON.parse(response.choices[0].choices[0].message.content)
+  const json: Partial<SSMPUCData> = JSON.parse(response.choices[0].choices[0].message.content)
 
   /*
    * Clean up project.
@@ -240,7 +240,7 @@ export async function extractSSMPUCBillDataWithSectorFlow(
   json.waterUsageUnit = 'm3'
   json.electricityUsageUnit = 'kWh'
 
-  return json
+  return json as SSMPUCData
 }
 
 /**
