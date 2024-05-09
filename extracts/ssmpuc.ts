@@ -4,14 +4,18 @@ import { parse } from 'date-fns/parse'
 import Debug from 'debug'
 import type Tesseract from 'tesseract.js'
 
-import { cleanNumberText, trimToNumber } from '../helpers/numbers.js'
+import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
+import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js'
 import { extractData } from '../index.js'
-import { replaceDateStringTypos } from '../utilities/dateUtilities.js'
+import { extractFullPageText } from '../utilities/ocrUtilities.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
 import type { BillData, DataExtractOptions } from './types.js'
 
 const debug = Debug('bill-data-extract:ssmpuc')
+
+export const ssmpucExtractType = 'ssmpuc'
+export const ssmpucDomain = 'ssmpuc.com'
 
 const ssmpucDataExtractOptions: DataExtractOptions<SSMPUCData> = {
   accountNumber: {
@@ -187,9 +191,7 @@ export async function extractSSMPUCBillDataWithSectorFlow(
   ssmpucBillPath: string,
   sectorFlowApiKey: string
 ): Promise<SSMPUCData> {
-  const rawData = await extractData([ssmpucBillPath], {
-    text: {}
-  })
+  const rawText = await extractFullPageText(ssmpucBillPath)
 
   const sectorFlow = new SectorFlow(sectorFlowApiKey)
 
@@ -226,7 +228,7 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     The "waterUsageMetered" and "waterUsageBilled" are equal.
     If there is no value for "Water Consumption", the "waterUsageMetered" and the "waterUsageBilled" should be 0.
     
-    ${rawData.text as string}`
+    ${rawText}`
   )
 
   const json = JSON.parse(response.choices[0].choices[0].message.content)
@@ -275,4 +277,14 @@ export async function extractSSMPUCBillDataWithSectorFlowBackup(
   }
 
   return billData
+}
+
+/**
+ * Checks whether a bill is an SSM PUC bill.
+ * @param {string} billPath - Path to a bill.
+ * @returns {Promise<boolean>} - Whether or not the bill is an SSM PUC bill.
+ */
+export async function isSSMPUCBill(billPath: string): Promise<boolean> {
+  const fullText = await extractFullPageText(billPath)
+  return fullText.includes(ssmpucDomain)
 }

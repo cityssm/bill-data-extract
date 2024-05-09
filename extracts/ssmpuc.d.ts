@@ -1,4 +1,6 @@
 import type { BillData } from './types.js';
+export declare const ssmpucExtractType = "ssmpuc";
+export declare const ssmpucDomain = "ssmpuc.com";
 export interface SSMPUCData extends BillData {
     waterUsageMetered: number | undefined;
     waterUsageBilled: number | undefined;
@@ -10,3 +12,4 @@ export interface SSMPUCData extends BillData {
 export declare function extractSSMPUCBillData(ssmpucBillPath: string): Promise<SSMPUCData>;
 export declare function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath: string, sectorFlowApiKey: string): Promise<SSMPUCData>;
 export declare function extractSSMPUCBillDataWithSectorFlowBackup(ssmpucBillPath: string, sectorFlowApiKey: string): Promise<SSMPUCData | undefined>;
+export declare function isSSMPUCBill(billPath: string): Promise<boolean>;

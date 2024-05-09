@@ -3,10 +3,12 @@
 
 import { SectorFlow } from '@cityssm/sectorflow'
 
-import { extractData } from '../index.js'
+import { extractFullPageText } from '../utilities/ocrUtilities.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
-import type { BillData, DataExtractOptions } from './types.js'
+import type { BillData } from './types.js'
+
+export const sectorflowExtractType = 'sectorflow'
 
 const sectorFlowPrompt = `Given the following text, extract the "account number" as "accountNumber", the "service address" as "serviceAddress", the "total amount due" as "totalAmountDue", and the "due date" as "dueDate" into a JSON object.
 The "totalAmountDue" should be formatted as a number.
@@ -31,21 +33,6 @@ interface SectorFlowBillData extends BillData {
   electricityUsageUnit?: string
 }
 
-const sectorFlowDataExtractOptions: DataExtractOptions<
-  Partial<SectorFlowBillData>
-> = {
-  accountNumber: {},
-  serviceAddress: {},
-  totalAmountDue: {},
-  dueDate: {},
-  gasUsage: {},
-  gasUsageUnit: {},
-  waterUsage: {},
-  waterUsageUnit: {},
-  electricityUsage: {},
-  electricityUsageUnit: {}
-}
-
 /**
  * Extracts data from a bill using SecotrFlow's AI platform.
  * @param {string} billPath - Path to the bill.
@@ -60,7 +47,7 @@ export async function extractBillDataWithSectorFlow(
    * Run OCR
    */
 
-  const rawData = await extractData([billPath], sectorFlowDataExtractOptions)
+  const rawText = await extractFullPageText(billPath)
 
   /*
    * Connect to SectorFlow
@@ -72,7 +59,7 @@ export async function extractBillDataWithSectorFlow(
 
   const response = await sectorFlow.sendChatMessage(
     projectId,
-    `${sectorFlowPrompt}\n\n${rawData.accountNumber ?? ''}`
+    `${sectorFlowPrompt}\n\n${rawText}`
   )
 
   const json = JSON.parse(response.choices[0].choices[0].message.content)

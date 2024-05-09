@@ -1,6 +1,12 @@
-import { trimToNumber } from '../helpers/numbers.js';
-import { trimTextFromEndUntil } from '../helpers/trimmers.js';
+import { dateToString } from '@cityssm/utils-datetime';
+import { parse } from 'date-fns/parse';
+import { replaceDateStringTypos } from '../helpers/dateHelpers.js';
+import { trimToNumber } from '../helpers/numberHelpers.js';
+import { trimTextFromEndUntil } from '../helpers/trimmingHelpers.js';
 import { extractData } from '../index.js';
+import { extractFullPageText } from '../utilities/ocrUtilities.js';
+export const enbridgeExtractType = 'enbridge';
+export const enbridgeDomain = 'enbridgegas.com';
 const enbridgeDataExtractOptions = {
     accountNumber: {
         pageNumber: 1,
@@ -62,10 +68,10 @@ const enbridgeDataExtractOptions = {
             yPercentage: 51
         },
         processingFunction(tesseractResult) {
-            let text = trimTextFromEndUntil(tesseractResult.data.text.trim(), /\d/);
-            const textPieces = text.split('\n');
-            text = textPieces.at(-1) ?? '';
-            return text;
+            const textPieces = trimTextFromEndUntil(tesseractResult.data.text.trim(), /\d/).split('\n');
+            const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '');
+            const date = parse(dateString, 'LLL dd, y', new Date());
+            return dateToString(date);
         }
     },
     gasUsage: {
@@ -93,4 +99,8 @@ export async function extractEnbridgeBillData(enbridgePdfPath) {
     const data = await extractData([enbridgePdfPath], enbridgeDataExtractOptions);
     data.gasUsageUnit = 'm3';
     return data;
+}
+export async function isEnbridgeBill(billPath) {
+    const fullText = await extractFullPageText(billPath);
+    return fullText.includes(enbridgeDomain);
 }

@@ -2,11 +2,14 @@ import { SectorFlow } from '@cityssm/sectorflow';
 import { dateToString } from '@cityssm/utils-datetime';
 import { parse } from 'date-fns/parse';
 import Debug from 'debug';
-import { cleanNumberText, trimToNumber } from '../helpers/numbers.js';
+import { replaceDateStringTypos } from '../helpers/dateHelpers.js';
+import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js';
 import { extractData } from '../index.js';
-import { replaceDateStringTypos } from '../utilities/dateUtilities.js';
+import { extractFullPageText } from '../utilities/ocrUtilities.js';
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 const debug = Debug('bill-data-extract:ssmpuc');
+export const ssmpucExtractType = 'ssmpuc';
+export const ssmpucDomain = 'ssmpuc.com';
 const ssmpucDataExtractOptions = {
     accountNumber: {
         pageNumber: 1,
@@ -143,9 +146,7 @@ export async function extractSSMPUCBillData(ssmpucBillPath) {
     return data;
 }
 export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey) {
-    const rawData = await extractData([ssmpucBillPath], {
-        text: {}
-    });
+    const rawText = await extractFullPageText(ssmpucBillPath);
     const sectorFlow = new SectorFlow(sectorFlowApiKey);
     const projectId = await getTemporaryProjectId(sectorFlow);
     const response = await sectorFlow.sendChatMessage(projectId, `Given the following text, extract
@@ -177,7 +178,7 @@ export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sector
     The "waterUsageMetered" and "waterUsageBilled" are equal.
     If there is no value for "Water Consumption", the "waterUsageMetered" and the "waterUsageBilled" should be 0.
     
-    ${rawData.text}`);
+    ${rawText}`);
     const json = JSON.parse(response.choices[0].choices[0].message.content);
     await sectorFlow.deleteProject(projectId);
     json.waterUsageUnit = 'm3';
@@ -199,4 +200,8 @@ export async function extractSSMPUCBillDataWithSectorFlowBackup(ssmpucBillPath, 
         billData = await extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey);
     }
     return billData;
+}
+export async function isSSMPUCBill(billPath) {
+    const fullText = await extractFullPageText(billPath);
+    return fullText.includes(ssmpucDomain);
 }

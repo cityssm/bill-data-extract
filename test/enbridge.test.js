@@ -9,6 +9,7 @@ await describe('bill-data-extract/enbridge', async () => {
             console.log(data);
             assert.ok(data);
             assert.strictEqual(data.accountNumber, expectedOutput.accountNumber);
+            assert.strictEqual(data.dueDate, expectedOutput.dueDate);
             assert.ok(data.serviceAddress.startsWith(expectedOutput.serviceAddress));
             assert.strictEqual(data.totalAmountDue, expectedOutput.totalAmountDue);
             assert.strictEqual(data.gasUsage, expectedOutput.gasUsage);

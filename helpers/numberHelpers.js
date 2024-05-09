@@ -1,4 +1,4 @@
-import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmers.js';
+import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmingHelpers.js';
 export function trimToNumber(rawText, isMoneyWithTwoDecimalPlaces = true) {
     let text = rawText.trim();
     text = trimTextFromStartUntil(text, /\d/);

@@ -1,8 +1,16 @@
-import { trimToNumber } from '../helpers/numbers.js'
-import { trimTextFromEndUntil } from '../helpers/trimmers.js'
+import { dateToString } from '@cityssm/utils-datetime'
+import { parse } from 'date-fns/parse'
+
+import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
+import { trimToNumber } from '../helpers/numberHelpers.js'
+import { trimTextFromEndUntil } from '../helpers/trimmingHelpers.js'
 import { extractData } from '../index.js'
+import { extractFullPageText } from '../utilities/ocrUtilities.js'
 
 import type { DataExtractOptions, GasBillData } from './types.js'
+
+export const enbridgeExtractType = 'enbridge'
+export const enbridgeDomain = 'enbridgegas.com'
 
 const enbridgeDataExtractOptions: DataExtractOptions<GasBillData> = {
   accountNumber: {
@@ -67,13 +75,15 @@ const enbridgeDataExtractOptions: DataExtractOptions<GasBillData> = {
       yPercentage: 51
     },
     processingFunction(tesseractResult) {
-      let text = trimTextFromEndUntil(tesseractResult.data.text.trim(), /\d/)
+      const textPieces = trimTextFromEndUntil(
+        tesseractResult.data.text.trim(),
+        /\d/
+      ).split('\n')
 
-      const textPieces = text.split('\n')
+      const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '')
+      const date = parse(dateString, 'LLL dd, y', new Date())
 
-      text = textPieces.at(-1) ?? ''
-
-      return text
+      return dateToString(date)
     }
   },
   gasUsage: {
@@ -114,4 +124,14 @@ export async function extractEnbridgeBillData(
   data.gasUsageUnit = 'm3'
 
   return data
+}
+
+/**
+ * Checks whether a bill is an Enbridge bill.
+ * @param {string} billPath - Path to a bill.
+ * @returns {Promise<boolean>} - Whether or not the bill is an Enbridge bill.
+ */
+export async function isEnbridgeBill(billPath: string): Promise<boolean> {
+  const fullText = await extractFullPageText(billPath)
+  return fullText.includes(enbridgeDomain)
 }

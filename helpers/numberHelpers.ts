@@ -1,4 +1,4 @@
-import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmers.js'
+import { trimTextFromEndUntil, trimTextFromStartUntil } from './trimmingHelpers.js'
 
 // eslint-disable-next-line no-secrets/no-secrets
 /**

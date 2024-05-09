@@ -155,6 +155,8 @@ export async function extractData<T extends Record<string, unknown>>(
   return result as T
 }
 
+export { getSuggestedExtractType } from './utilities/extractUtilities.js'
+
 export type {
   BillData,
   DataExtractOptions,
