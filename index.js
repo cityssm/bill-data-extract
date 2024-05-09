@@ -77,5 +77,12 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
     }
     return result;
 }
+export async function extractFullPageText(billPath, pageNumber = 1) {
+    const rawData = await extractData([billPath], {
+        text: {
+            pageNumber
+        }
+    });
+    return rawData.text;
+}
 export { getSuggestedExtractType } from './utilities/extractUtilities.js';
-export { extractFullPageText } from './utilities/ocrUtilities.js';

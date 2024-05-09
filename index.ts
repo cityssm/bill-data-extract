@@ -155,9 +155,26 @@ export async function extractData<T extends Record<string, unknown>>(
   return result as T
 }
 
-export { getSuggestedExtractType } from './utilities/extractUtilities.js'
+/**
+ * Extracts the full text for a given page.
+ * @param {string} billPath - The bill path.
+ * @param {number} pageNumber - The page number, defaults to 1.
+ * @returns {string} - The full text of the given page.
+ */
+export async function extractFullPageText(
+  billPath: string,
+  pageNumber: number = 1
+): Promise<string> {
+  const rawData = await extractData([billPath], {
+    text: {
+      pageNumber
+    }
+  })
 
-export { extractFullPageText } from './utilities/ocrUtilities.js'
+  return rawData.text as string
+}
+
+export { getSuggestedExtractType } from './utilities/extractUtilities.js'
 
 export type {
   DataExtractOptions,
