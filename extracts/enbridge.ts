@@ -132,40 +132,53 @@ export async function extractEnbridgeBillData(
 
 /**
  * Extracts data from an Enbridge bill using SectorFlow AI.
- * @param {string} enbridgeBillPath - Path to an Enbridge bill.
+ * @param {string} enbridgePdfPath - Path to an Enbridge bill.
  * @param {string} sectorFlowApiKey - SectorFlow API key.
  * @returns {Promise<GasBillData>} - Enbridge bill data.
  */
 export async function extractEnbridgeBillDataWithSectorFlow(
-  enbridgeBillPath: string,
+  enbridgePdfPath: string,
   sectorFlowApiKey: string
 ): Promise<GasBillData> {
-  const rawText = await extractFullPageText(enbridgeBillPath)
+  const data = await extractData([enbridgePdfPath], {
+    text: {
+      pageNumber: 1,
+      topLeftCoordinate: {
+        xPercentage: 0,
+        yPercentage: 12
+      },
+      bottomRightCoordinate: {
+        xPercentage: 100,
+        yPercentage: 70
+      }
+    }
+  })
+
+  const rawText = data.text as string // await extractFullPageText(enbridgeBillPath)
 
   const sectorFlow = new SectorFlow(sectorFlowApiKey)
 
   const projectId = await getTemporaryProjectId(sectorFlow)
 
-  const response = await sectorFlow.sendChatMessage(
-    projectId,
-    `Given the following text, extract
-    the "Account Number" as "accountNumber",
-    the "Service Address" as "serviceAddress",
-    the usage as "gasUsage",
-    the "Total Amount" as "totalAmountDue",
-    and the "Due Date" as "dueDate"
-    into a JSON object.
-    The "accountNumber" is in the first half of the text.
-    The "accountNumber" is a text string with 12 digits separated by spaces, and starting with "9".
-    The "accountNumber" is next to the bill date.
-    The "accountNumber does not contain dashes.
-    The "dueDate" should be formatted as "yyyy-mm-dd".
-    The "gasUsage" is a number followed by "m3".
-    The "totalAmountDue" is the dollar amount including taxes.
-    The "totalAmountDue" and "gasUsage" should be formatted as numbers.
-    
-    ${rawText}`
-  )
+  const prompt = `Given the following text, extract
+  the "Account Number" as "accountNumber",
+  the "Service Address" as "serviceAddress",
+  the usage as "gasUsage",
+  the "Total Amount" as "totalAmountDue",
+  and the "Due Date" as "dueDate"
+  into a JSON object.
+  The "accountNumber" is in the first half of the text.
+  The "accountNumber" is a text string with 12 digits separated by spaces, and starting with "9".
+  The "accountNumber" is next to the bill date.
+  The "accountNumber does not contain dashes.
+  The "dueDate" should be formatted as "yyyy-mm-dd".
+  The "gasUsage" is a number followed by "m3".
+  The "totalAmountDue" is the dollar amount including taxes.
+  The "totalAmountDue" and "gasUsage" should be formatted as numbers.
+  
+  ${rawText}`
+
+  const response = await sectorFlow.sendChatMessage(projectId, prompt)
 
   const json: Partial<GasBillData> = JSON.parse(
     response.choices[0].choices[0].message.content
@@ -177,6 +190,7 @@ export async function extractEnbridgeBillDataWithSectorFlow(
 
   await sectorFlow.deleteProject(projectId)
 
+  json.accountNumber = json.accountNumber?.replaceAll(' ', '')
   json.gasUsageUnit = 'm3'
 
   return json as GasBillData
@@ -198,10 +212,7 @@ export async function extractEnbridgeBillDataWithSectorFlowBackup(
     billData = await extractEnbridgeBillData(enbridgeBillPath)
   } catch {}
 
-  if (
-    billData === undefined ||
-    !/^\d{12}/.test(billData.accountNumber)
-  ) {
+  if (billData === undefined || !/^\d{12}/.test(billData.accountNumber)) {
     debug('Falling back to SectorFlow')
 
     billData = await extractEnbridgeBillDataWithSectorFlow(
