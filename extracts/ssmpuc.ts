@@ -10,7 +10,11 @@ import { extractData } from '../index.js'
 import { extractFullPageText } from '../utilities/ocrUtilities.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
-import type { BillData, DataExtractOptions } from './types.js'
+import type {
+  DataExtractOptions,
+  ElectricityBillData,
+  WaterBillData
+} from './types.js'
 
 const debug = Debug('bill-data-extract:ssmpuc')
 
@@ -81,7 +85,7 @@ const ssmpucDataExtractOptions: DataExtractOptions<SSMPUCData> = {
       return dateToString(date)
     }
   },
-  electricityUsageMetered: {
+  electricityUsage: {
     pageNumber: 1,
     topLeftCoordinate: {
       xPercentage: 2.5,
@@ -109,7 +113,7 @@ const ssmpucDataExtractOptions: DataExtractOptions<SSMPUCData> = {
       return extractLastNumberInRow('E', tesseractResult)
     }
   },
-  waterUsageMetered: {
+  waterUsage: {
     pageNumber: 1,
     topLeftCoordinate: {
       xPercentage: 2.5,
@@ -155,14 +159,9 @@ function extractLastNumberInRow(
   return undefined
 }
 
-export interface SSMPUCData extends BillData {
-  waterUsageMetered: number | undefined
+export interface SSMPUCData extends ElectricityBillData, WaterBillData {
   waterUsageBilled: number | undefined
-  waterUsageUnit: 'm3'
-
-  electricityUsageMetered: number | undefined
   electricityUsageBilled: number | undefined
-  electricityUsageUnit: 'kWh'
 }
 
 /**
@@ -202,9 +201,9 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     `Given the following text, extract
     the "Account Number" as "accountNumber",
     the "Service Address" as "serviceAddress",
-    the electric metered usage as "electricityUsageMetered",
+    the electric metered usage as "electricityUsage",
     the electric billed usage as "electricityUsageBilled",
-    the water metered usage as "waterUsageMetered",
+    the water metered usage as "waterUsage",
     the water billed usage as "waterUsageBilled",
     the "Amount Due" as "totalAmountDue",
     and the "Due Date" as "dueDate"
@@ -212,21 +211,21 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     The "accountNumber" is a text string with 7 digits, a dash, and two more digits.
     The "dueDate" should be formatted as "yyyy-mm-dd".
     The "totalAmountDue", 
-    "electricityUsageMetered", "electricityUsageBilled",
-    "waterUsageMetered", "waterUsageBilled",
+    "electricityUsage", "electricityUsageBilled",
+    "waterUsage", "waterUsageBilled",
     and "totalAmountDue" should be formatted as numbers.
 
     The "electricityUsageBilled" is in a row of text starting with the letter "E".
     The "electricityUsageBilled" is the number right before "kWh"
-    and is greater than or equal to the "electricityUsageMetered".
+    and is greater than or equal to the "electricityUsage".
     
-    The "electricityUsageMetered" is the sum of first numbers after "Off Peak Winter", "Mid Peak Winter", and "On Peak Winter" usage
+    The "electricityUsage" is the sum of first numbers after "Off Peak Winter", "Mid Peak Winter", and "On Peak Winter" usage
     and is equal to a number next to the "electricityUsageBilled".
     
-    The "waterUsageMetered" and "waterUsageBilled" are in a row of text starting with the letter "W".
+    The "waterUsage" and "waterUsageBilled" are in a row of text starting with the letter "W".
     The "waterUsageBilled" is the number right before "cu.metre",
-    The "waterUsageMetered" and "waterUsageBilled" are equal.
-    If there is no value for "Water Consumption", the "waterUsageMetered" and the "waterUsageBilled" should be 0.
+    The "waterUsage" and "waterUsageBilled" are equal.
+    If there is no value for "Water Consumption", the "waterUsage" and the "waterUsageBilled" should be 0.
     
     ${rawText}`
   )
@@ -264,9 +263,8 @@ export async function extractSSMPUCBillDataWithSectorFlowBackup(
   if (
     billData === undefined ||
     !/^\d{7}/.test(billData.accountNumber) ||
-    (billData.electricityUsageMetered ?? 0) >
-      (billData.electricityUsageBilled ?? 0) ||
-    (billData.waterUsageMetered ?? 0) > (billData.waterUsageBilled ?? 0)
+    (billData.electricityUsage ?? 0) > (billData.electricityUsageBilled ?? 0) ||
+    (billData.waterUsage ?? 0) > (billData.waterUsageBilled ?? 0)
   ) {
     debug('Falling back to SectorFlow')
 

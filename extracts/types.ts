@@ -40,3 +40,13 @@ export interface GasBillData extends BillData {
   gasUsage: number
   gasUsageUnit: 'm3'
 }
+
+export interface ElectricityBillData extends BillData {
+  electricityUsage: number
+  electricityUsageUnit: 'kWh'
+}
+
+export interface WaterBillData extends BillData {
+  waterUsage: number
+  waterUsageUnit: 'm3'
+}

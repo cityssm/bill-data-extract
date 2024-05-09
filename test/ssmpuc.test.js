@@ -12,9 +12,9 @@ await describe('bill-data-extract/ssmpuc', async () => {
             assert.strictEqual(data.dueDate, expectedOutput.dueDate);
             assert.ok(data.serviceAddress?.startsWith(expectedOutput.serviceAddress));
             assert.strictEqual(data.totalAmountDue, expectedOutput.totalAmountDue);
-            assert.strictEqual(data.electricityUsageMetered, expectedOutput.electricityUsageMetered);
+            assert.strictEqual(data.electricityUsage, expectedOutput.electricityUsage);
             assert.strictEqual(data.electricityUsageBilled, expectedOutput.electricityUsageBilled);
-            assert.strictEqual(data.waterUsageMetered, expectedOutput.waterUsageMetered);
+            assert.strictEqual(data.waterUsage, expectedOutput.waterUsage);
             assert.strictEqual(data.waterUsageBilled, expectedOutput.waterUsageBilled);
         });
     }

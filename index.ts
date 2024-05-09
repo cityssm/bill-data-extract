@@ -158,9 +158,11 @@ export async function extractData<T extends Record<string, unknown>>(
 export { getSuggestedExtractType } from './utilities/extractUtilities.js'
 
 export type {
-  BillData,
   DataExtractOptions,
   DataField,
   DataFieldCoordinate,
-  GasBillData
+  BillData,
+  GasBillData,
+  ElectricityBillData,
+  WaterBillData
 } from './extracts/types.js'

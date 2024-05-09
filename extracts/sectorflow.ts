@@ -6,7 +6,11 @@ import { SectorFlow } from '@cityssm/sectorflow'
 import { extractFullPageText } from '../utilities/ocrUtilities.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
-import type { BillData } from './types.js'
+import type {
+  ElectricityBillData,
+  GasBillData,
+  WaterBillData
+} from './types.js'
 
 export const sectorflowExtractType = 'sectorflow'
 
@@ -22,16 +26,10 @@ the unit of measure for the electricity usage (likely kWh) as "electricityUsageU
 the "water usage" as "waterUsage"
 and the unit of measure for the water usage (likely m3 or cu. metre) as "waterUsageUnit".`
 
-interface SectorFlowBillData extends BillData {
-  gasUsage?: number
-  gasUsageUnit?: string
-
-  waterUsage?: number | undefined
-  waterUsageUnit?: string
-
-  electricityUsage?: number | undefined
-  electricityUsageUnit?: string
-}
+interface SectorFlowBillData
+  extends Partial<GasBillData>,
+    Partial<ElectricityBillData>,
+    Partial<WaterBillData> {}
 
 /**
  * Extracts data from a bill using SecotrFlow's AI platform.
@@ -42,7 +40,7 @@ interface SectorFlowBillData extends BillData {
 export async function extractBillDataWithSectorFlow(
   billPath: string,
   sectorFlowApiKey: string
-): Promise<BillData> {
+): Promise<SectorFlowBillData> {
   /*
    * Run OCR
    */
