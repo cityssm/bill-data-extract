@@ -85,6 +85,8 @@ const enbridgeDataExtractOptions = {
         processingFunction(tesseractResult) {
             const textPieces = trimTextFromEndUntil(tesseractResult.data.text.trim(), /\d/).split('\n');
             const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '')
+                .replaceAll(',', ', ')
+                .replaceAll('  ', ' ')
                 .slice(-12)
                 .trim();
             try {

@@ -107,6 +107,8 @@ const enbridgeDataExtractOptions: DataExtractOptions<GasBillData> = {
       ).split('\n')
 
       const dateString = replaceDateStringTypos(textPieces.at(-1) ?? '')
+        .replaceAll(',', ', ')
+        .replaceAll('  ', ' ')
         .slice(-12)
         .trim()
 
