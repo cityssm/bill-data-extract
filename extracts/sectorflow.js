@@ -1,5 +1,5 @@
 import { SectorFlow } from '@cityssm/sectorflow';
-import { extractFullPageText } from '../utilities/ocrUtilities.js';
+import { extractFullPageText } from '../index.js';
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 export const sectorflowExtractType = 'sectorflow';
 const sectorFlowPrompt = `Given the following text, extract the "account number" as "accountNumber", the "service address" as "serviceAddress", the "total amount due" as "totalAmountDue", and the "due date" as "dueDate" into a JSON object.

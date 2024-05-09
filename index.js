@@ -78,3 +78,4 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
     return result;
 }
 export { getSuggestedExtractType } from './utilities/extractUtilities.js';
+export { extractFullPageText } from './utilities/ocrUtilities.js';

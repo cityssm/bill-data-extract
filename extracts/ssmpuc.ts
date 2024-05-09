@@ -6,8 +6,7 @@ import type Tesseract from 'tesseract.js'
 
 import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
 import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js'
-import { extractData } from '../index.js'
-import { extractFullPageText } from '../utilities/ocrUtilities.js'
+import { extractData, extractFullPageText } from '../index.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
 import type {

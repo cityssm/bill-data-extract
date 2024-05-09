@@ -3,7 +3,7 @@
 
 import { SectorFlow } from '@cityssm/sectorflow'
 
-import { extractFullPageText } from '../utilities/ocrUtilities.js'
+import { extractFullPageText } from '../index.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
 import type {

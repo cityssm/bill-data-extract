@@ -4,8 +4,7 @@ import { parse } from 'date-fns/parse'
 import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
 import { trimToNumber } from '../helpers/numberHelpers.js'
 import { trimTextFromEndUntil } from '../helpers/trimmingHelpers.js'
-import { extractData } from '../index.js'
-import { extractFullPageText } from '../utilities/ocrUtilities.js'
+import { extractData, extractFullPageText } from '../index.js'
 
 import type { DataExtractOptions, GasBillData } from './types.js'
 

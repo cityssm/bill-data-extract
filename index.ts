@@ -157,6 +157,8 @@ export async function extractData<T extends Record<string, unknown>>(
 
 export { getSuggestedExtractType } from './utilities/extractUtilities.js'
 
+export { extractFullPageText } from './utilities/ocrUtilities.js'
+
 export type {
   DataExtractOptions,
   DataField,
