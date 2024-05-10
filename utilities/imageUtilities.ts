@@ -7,6 +7,12 @@ import { imageSize as getImageSize } from 'image-size'
 import { type ISizeCalculationResult } from 'image-size/dist/types/interface.js'
 import { convert as convertPdfToImage } from 'pdf-img-convert'
 
+// eslint-disable-next-line no-secrets/no-secrets
+/**
+ * Ensures all files are images.
+ * @param {string[]} pdfOrImageFilePaths - An array of file paths.
+ * @returns {object} - Two arrays, one with all image paths, another with images that were generated and safe to delete.
+ */
 export async function pdfOrImageFilePathsToImageFilePaths(
   pdfOrImageFilePaths: string[]
 ): Promise<{ imageFilePaths: string[]; tempFilePaths: string[] }> {

@@ -1,4 +1,4 @@
-const preferredModels = ['ChatGPT'];
+const preferredModels = ['ChatGPT', 'Claude 3 Haiku'];
 let preferredModelId = '';
 export async function getTemporaryProjectId(sectorFlow) {
     if (preferredModelId === '') {
@@ -21,4 +21,14 @@ export async function getTemporaryProjectId(sectorFlow) {
         sharingType: 'PRIVATE'
     });
     return project.id;
+}
+export function findAndParseJSON(contentString) {
+    let cleanContentString = contentString.trim();
+    while (cleanContentString.length > 0 && cleanContentString.at(0) !== '{') {
+        cleanContentString = cleanContentString.slice(1);
+    }
+    while (cleanContentString.length > 0 && cleanContentString.at(-1) !== '}') {
+        cleanContentString = cleanContentString.slice(0, -1);
+    }
+    return JSON.parse(cleanContentString);
 }

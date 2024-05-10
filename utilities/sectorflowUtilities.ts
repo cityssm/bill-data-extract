@@ -1,6 +1,6 @@
 import type { SectorFlow } from '@cityssm/sectorflow'
 
-const preferredModels = ['ChatGPT']
+const preferredModels = ['ChatGPT', 'Claude 3 Haiku']
 
 let preferredModelId = ''
 
@@ -40,4 +40,24 @@ export async function getTemporaryProjectId(
   })
 
   return project.id
+}
+
+/**
+ * Finds a JSON object within a string, and parses it.
+ * @param {string} contentString - A text string, possibly with text on either side of the JSON.
+ * @returns {object} - A parsed object.
+ */
+export function findAndParseJSON(contentString: string): object {
+  let cleanContentString = contentString.trim()
+
+  // Remove first character until {
+  while (cleanContentString.length > 0 && cleanContentString.at(0) !== '{') {
+    cleanContentString = cleanContentString.slice(1)
+  }
+
+  while (cleanContentString.length > 0 && cleanContentString.at(-1) !== '}') {
+    cleanContentString = cleanContentString.slice(0, -1)
+  }
+
+  return JSON.parse(cleanContentString)
 }

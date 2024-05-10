@@ -9,7 +9,10 @@ import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js'
 import { extractData, extractFullPageText } from '../index.js'
 import { deleteTempFiles } from '../utilities/fileUtilities.js'
 import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js'
-import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
+import {
+  findAndParseJSON,
+  getTemporaryProjectId
+} from '../utilities/sectorflowUtilities.js'
 
 import type {
   DataExtractOptions,
@@ -224,11 +227,12 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     "waterUsage", and "waterUsageBilled"
     should be formatted as numbers.
 
-    The "electricityUsageBilled" is in a row of text starting with the letter "E".
-    The "electricityUsageBilled" is the number right before "kWh"
+    The "electricityUsageBilled" is in a row of text starting with the letter "E",
+    is the number right before "kWh",
     and is greater than or equal to the "electricityUsage".
     
-    The "electricityUsage" is the sum of first numbers after "Off Peak Winter", "Mid Peak Winter", and "On Peak Winter" usage
+    The "electricityUsage" is the sum of first numbers after
+    "Off Peak Winter", "Mid Peak Winter", and "On Peak Winter" usage
     and is equal to a number next to the "electricityUsageBilled".
     
     The "waterUsage" and "waterUsageBilled" are in a row of text starting with the letter "W".
@@ -242,9 +246,9 @@ export async function extractSSMPUCBillDataWithSectorFlow(
     }
   )
 
-  const json: Partial<SSMPUCData> = JSON.parse(
+  const json = findAndParseJSON(
     response.choices[0].choices[0].message.content
-  )
+  ) as Partial<SSMPUCData>
 
   /*
    * Clean up project.
