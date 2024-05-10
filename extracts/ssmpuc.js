@@ -5,6 +5,8 @@ import Debug from 'debug';
 import { replaceDateStringTypos } from '../helpers/dateHelpers.js';
 import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js';
 import { extractData, extractFullPageText } from '../index.js';
+import { deleteTempFiles } from '../utilities/fileUtilities.js';
+import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js';
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 const debug = Debug('bill-data-extract:ssmpuc');
 export const ssmpucExtractType = 'ssmpuc';
@@ -145,10 +147,11 @@ export async function extractSSMPUCBillData(ssmpucBillPath) {
     return data;
 }
 export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey) {
-    const rawText = await extractFullPageText(ssmpucBillPath);
     const sectorFlow = new SectorFlow(sectorFlowApiKey);
     const projectId = await getTemporaryProjectId(sectorFlow);
-    const response = await sectorFlow.sendChatMessage(projectId, `Given the following text, extract
+    const { imageFilePaths, tempFilePaths } = await pdfOrImageFilePathsToImageFilePaths([ssmpucBillPath]);
+    const sectorFlowFile = await sectorFlow.uploadFile(projectId, imageFilePaths[0]);
+    const response = await sectorFlow.sendChatMessage(projectId, `Extract
     the "Account Number" as "accountNumber",
     the "Service Address" as "serviceAddress",
     the electric metered usage as "electricityUsage",
@@ -158,11 +161,13 @@ export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sector
     the "Amount Due" as "totalAmountDue",
     and the "Due Date" as "dueDate"
     into a JSON object.
+
     The "accountNumber" is a text string with 7 digits, a dash, and two more digits.
+    The "serviceAddress" is a text string.
     The "dueDate" should be formatted as "yyyy-mm-dd".
     The "totalAmountDue", 
     "electricityUsage", "electricityUsageBilled",
-    "waterUsage", and "waterUsageBilled",
+    "waterUsage", and "waterUsageBilled"
     should be formatted as numbers.
 
     The "electricityUsageBilled" is in a row of text starting with the letter "E".
@@ -175,11 +180,14 @@ export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sector
     The "waterUsage" and "waterUsageBilled" are in a row of text starting with the letter "W".
     The "waterUsageBilled" is the number right before "cu.metre",
     The "waterUsage" and "waterUsageBilled" are equal.
-    If there is no value for "Water Consumption", the "waterUsage" and the "waterUsageBilled" should be 0.
-    
-    ${rawText}`);
+    If there is no value for "Water Consumption", the "waterUsage" and the "waterUsageBilled" should be 0.`, {
+        threadId: sectorFlowFile.threadId,
+        collectionName: sectorFlowFile.collectionName,
+        fileName: sectorFlowFile.fileName
+    });
     const json = JSON.parse(response.choices[0].choices[0].message.content);
     await sectorFlow.deleteProject(projectId);
+    await deleteTempFiles(tempFilePaths);
     json.waterUsageUnit = 'm3';
     json.electricityUsageUnit = 'kWh';
     return json;

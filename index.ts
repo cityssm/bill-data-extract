@@ -1,13 +1,12 @@
-import fs from 'node:fs/promises'
-
 import Debug from 'debug'
 import type Tesseract from 'tesseract.js'
 import { createWorker } from 'tesseract.js'
 
 import type { DataExtractOptions } from './extracts/types.js'
+import { deleteTempFiles } from './utilities/fileUtilities.js'
 import {
   imageFilePathsToImageFiles,
-  pdfFilePathToImageFilePaths
+  pdfOrImageFilePathsToImageFilePaths
 } from './utilities/imageUtilities.js'
 import { percentageToCoordinate } from './utilities/mathUtilities.js'
 
@@ -35,23 +34,8 @@ export async function extractData<T extends Record<string, unknown>>(
   pdfOrImageFilePaths: string[],
   extractOptions: DataExtractOptions<T>
 ): Promise<T> {
-  const imageFilePaths: string[] = []
-  const tempFilePaths: string[] = []
-
-  /*
-   * Ensure all files are images
-   */
-
-  for (const filePath of pdfOrImageFilePaths) {
-    if (filePath.toLowerCase().endsWith('.pdf')) {
-      const tempImageFilePaths = await pdfFilePathToImageFilePaths(filePath)
-
-      imageFilePaths.push(...tempImageFilePaths)
-      tempFilePaths.push(...tempImageFilePaths)
-    } else {
-      imageFilePaths.push(filePath)
-    }
-  }
+  const { imageFilePaths, tempFilePaths } =
+    await pdfOrImageFilePathsToImageFilePaths(pdfOrImageFilePaths)
 
   /*
    * Populate image dimensions
@@ -143,14 +127,7 @@ export async function extractData<T extends Record<string, unknown>>(
    * Clean up temp files
    */
 
-  for (const tempFilePath of tempFilePaths) {
-    try {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.unlink(tempFilePath)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  await deleteTempFiles(tempFilePaths)
 
   return result as T
 }

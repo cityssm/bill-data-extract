@@ -1,25 +1,14 @@
-import fs from 'node:fs/promises';
 import Debug from 'debug';
 import { createWorker } from 'tesseract.js';
-import { imageFilePathsToImageFiles, pdfFilePathToImageFilePaths } from './utilities/imageUtilities.js';
+import { deleteTempFiles } from './utilities/fileUtilities.js';
+import { imageFilePathsToImageFiles, pdfOrImageFilePathsToImageFilePaths } from './utilities/imageUtilities.js';
 import { percentageToCoordinate } from './utilities/mathUtilities.js';
 const debug = Debug('bill-data-extract:index');
 function getOCRCacheKey(options) {
     return `${options.imagePath}::${options.pageNumber}::${options.xTop}::${options.yTop}::${options.xBottom}::${options.yBottom}`;
 }
 export async function extractData(pdfOrImageFilePaths, extractOptions) {
-    const imageFilePaths = [];
-    const tempFilePaths = [];
-    for (const filePath of pdfOrImageFilePaths) {
-        if (filePath.toLowerCase().endsWith('.pdf')) {
-            const tempImageFilePaths = await pdfFilePathToImageFilePaths(filePath);
-            imageFilePaths.push(...tempImageFilePaths);
-            tempFilePaths.push(...tempImageFilePaths);
-        }
-        else {
-            imageFilePaths.push(filePath);
-        }
-    }
+    const { imageFilePaths, tempFilePaths } = await pdfOrImageFilePathsToImageFilePaths(pdfOrImageFilePaths);
     const imageFiles = imageFilePathsToImageFiles(imageFilePaths);
     const ocrCache = {};
     const result = {};
@@ -67,14 +56,7 @@ export async function extractData(pdfOrImageFilePaths, extractOptions) {
     finally {
         await worker.terminate();
     }
-    for (const tempFilePath of tempFilePaths) {
-        try {
-            await fs.unlink(tempFilePath);
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
+    await deleteTempFiles(tempFilePaths);
     return result;
 }
 export async function extractFullPageText(billPath, pageNumber = 1) {

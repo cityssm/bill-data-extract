@@ -7,6 +7,29 @@ import { imageSize as getImageSize } from 'image-size'
 import { type ISizeCalculationResult } from 'image-size/dist/types/interface.js'
 import { convert as convertPdfToImage } from 'pdf-img-convert'
 
+export async function pdfOrImageFilePathsToImageFilePaths(
+  pdfOrImageFilePaths: string[]
+): Promise<{ imageFilePaths: string[]; tempFilePaths: string[] }> {
+  const imageFilePaths: string[] = []
+  const tempFilePaths: string[] = []
+
+  for (const filePath of pdfOrImageFilePaths) {
+    if (filePath.toLowerCase().endsWith('.pdf')) {
+      const tempImageFilePaths = await pdfFilePathToImageFilePaths(filePath)
+
+      imageFilePaths.push(...tempImageFilePaths)
+      tempFilePaths.push(...tempImageFilePaths)
+    } else {
+      imageFilePaths.push(filePath)
+    }
+  }
+
+  return {
+    imageFilePaths,
+    tempFilePaths
+  }
+}
+
 /**
  * Creates images from a PDF.
  * @param {string} pdfFilePath - Path to a PDF file.

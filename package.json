@@ -35,16 +35,16 @@
   "homepage": "https://github.com/cityssm/bill-data-extract#readme",
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.12.10",
+    "@types/node": "^20.12.11",
     "eslint-config-cityssm": "^2.0.1"
   },
   "dependencies": {
-    "@cityssm/sectorflow": "^0.3.0",
+    "@cityssm/sectorflow": "^0.4.1",
     "@cityssm/utils-datetime": "^1.1.2",
     "date-fns": "^3.6.0",
     "debug": "^4.3.4",
     "image-size": "^1.1.1",
     "pdf-img-convert": "^1.2.1",
-    "tesseract.js": "^5.0.5"
+    "tesseract.js": "^5.1.0"
   }
 }
