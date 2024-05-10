@@ -4,7 +4,10 @@
 import { SectorFlow } from '@cityssm/sectorflow'
 
 import { extractFullPageText } from '../index.js'
-import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
+import {
+  findAndParseJSON,
+  getTemporaryProjectId
+} from '../utilities/sectorflowUtilities.js'
 
 import type {
   ElectricityBillData,
@@ -60,7 +63,9 @@ export async function extractBillDataWithSectorFlow(
     `${sectorFlowPrompt}\n\n${rawText}`
   )
 
-  const json = JSON.parse(response.choices[0].choices[0].message.content)
+  const json = findAndParseJSON(
+    response.choices[0].choices[0].message.content
+  ) as SectorFlowBillData
 
   /*
    * Clean up project.

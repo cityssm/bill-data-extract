@@ -1,6 +1,6 @@
 import { SectorFlow } from '@cityssm/sectorflow';
 import { extractFullPageText } from '../index.js';
-import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
+import { findAndParseJSON, getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 export const sectorflowExtractType = 'sectorflow';
 const sectorFlowPrompt = `Given the following text, extract the "account number" as "accountNumber", the "service address" as "serviceAddress", the "total amount due" as "totalAmountDue", and the "due date" as "dueDate" into a JSON object.
 The "totalAmountDue" should be formatted as a number.
@@ -18,7 +18,7 @@ export async function extractBillDataWithSectorFlow(billPath, sectorFlowApiKey) 
     const sectorFlow = new SectorFlow(sectorFlowApiKey);
     const projectId = await getTemporaryProjectId(sectorFlow);
     const response = await sectorFlow.sendChatMessage(projectId, `${sectorFlowPrompt}\n\n${rawText}`);
-    const json = JSON.parse(response.choices[0].choices[0].message.content);
+    const json = findAndParseJSON(response.choices[0].choices[0].message.content);
     await sectorFlow.deleteProject(projectId);
     return json;
 }
