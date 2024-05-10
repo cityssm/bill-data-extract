@@ -48,7 +48,7 @@ const enbridgeDataExtractOptions = {
         processingFunction(tesseractResult) {
             const textLines = tesseractResult.data.text.trim().split('\n');
             let serviceAddressIndex = 0;
-            for (serviceAddressIndex = 0; serviceAddressIndex <= textLines.length; serviceAddressIndex += 1) {
+            for (serviceAddressIndex = 0; serviceAddressIndex < textLines.length; serviceAddressIndex += 1) {
                 if (textLines[serviceAddressIndex].startsWith('Service')) {
                     serviceAddressIndex += 1;
                     if (textLines[serviceAddressIndex].trim() === '') {

@@ -60,7 +60,7 @@ const enbridgeDataExtractOptions: DataExtractOptions<GasBillData> = {
 
       for (
         serviceAddressIndex = 0;
-        serviceAddressIndex <= textLines.length;
+        serviceAddressIndex < textLines.length;
         serviceAddressIndex += 1
       ) {
         // eslint-disable-next-line security/detect-object-injection
