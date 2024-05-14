@@ -1,6 +1,6 @@
 import type { SectorFlow } from '@cityssm/sectorflow'
 
-const preferredModels = ['ChatGPT', 'Claude 3 Haiku']
+const preferredModels = ['ChatGPT 3.5', 'Claude 3 Haiku']
 
 let preferredModelId = ''
 

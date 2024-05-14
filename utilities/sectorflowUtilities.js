@@ -1,4 +1,4 @@
-const preferredModels = ['ChatGPT', 'Claude 3 Haiku'];
+const preferredModels = ['ChatGPT 3.5', 'Claude 3 Haiku'];
 let preferredModelId = '';
 export async function getTemporaryProjectId(sectorFlow) {
     if (preferredModelId === '') {
