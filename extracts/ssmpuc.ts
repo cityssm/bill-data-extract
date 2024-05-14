@@ -7,8 +7,6 @@ import type Tesseract from 'tesseract.js'
 import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
 import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js'
 import { extractData, extractFullPageText } from '../index.js'
-import { deleteTempFiles } from '../utilities/fileUtilities.js'
-import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js'
 import {
   findAndParseJSON,
   getTemporaryProjectId
@@ -198,12 +196,9 @@ export async function extractSSMPUCBillDataWithSectorFlow(
 
   const projectId = await getTemporaryProjectId(sectorFlow)
 
-  const { imageFilePaths, tempFilePaths } =
-    await pdfOrImageFilePathsToImageFilePaths([ssmpucBillPath])
-
   const sectorFlowFile = await sectorFlow.uploadFile(
     projectId,
-    imageFilePaths[0]
+    ssmpucBillPath // imageFilePaths[0]
   )
 
   const response = await sectorFlow.sendChatMessage(
@@ -255,7 +250,6 @@ export async function extractSSMPUCBillDataWithSectorFlow(
    */
 
   await sectorFlow.deleteProject(projectId)
-  await deleteTempFiles(tempFilePaths)
 
   json.waterUsageUnit = 'm3'
   json.electricityUsageUnit = 'kWh'

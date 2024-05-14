@@ -7,8 +7,6 @@ import { replaceDateStringTypos } from '../helpers/dateHelpers.js'
 import { trimToNumber } from '../helpers/numberHelpers.js'
 import { trimTextFromEndUntil } from '../helpers/trimmingHelpers.js'
 import { extractData, extractFullPageText } from '../index.js'
-import { deleteTempFiles } from '../utilities/fileUtilities.js'
-import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js'
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js'
 
 import type { DataExtractOptions, GasBillData } from './types.js'
@@ -176,12 +174,9 @@ export async function extractEnbridgeBillDataWithSectorFlow(
 
   const projectId = await getTemporaryProjectId(sectorFlow)
 
-  const { imageFilePaths, tempFilePaths } =
-    await pdfOrImageFilePathsToImageFilePaths([enbridgeBillPath])
-
   const sectorFlowFile = await sectorFlow.uploadFile(
     projectId,
-    imageFilePaths[0]
+    enbridgeBillPath
   )
 
   const prompt = `Extract
@@ -196,7 +191,7 @@ export async function extractEnbridgeBillDataWithSectorFlow(
   The "accountNumber" is next to the bill date.
   The "accountNumber does not contain dashes.
   The "dueDate" should be formatted as "yyyy-mm-dd".
-  The "gasUsage" is a number followed by "m3".
+  The "gasUsage" is a number followed by "m3". Return the total amount used, not the "per day" amount.
   The "totalAmountDue" is the dollar amount including taxes.
   The "totalAmountDue" and "gasUsage" should be formatted as numbers.`
 
@@ -215,7 +210,6 @@ export async function extractEnbridgeBillDataWithSectorFlow(
    */
 
   await sectorFlow.deleteProject(projectId)
-  await deleteTempFiles(tempFilePaths)
 
   json.accountNumber = json.accountNumber?.replaceAll(' ', '')
   json.gasUsageUnit = 'm3'

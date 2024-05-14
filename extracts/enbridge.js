@@ -6,8 +6,6 @@ import { replaceDateStringTypos } from '../helpers/dateHelpers.js';
 import { trimToNumber } from '../helpers/numberHelpers.js';
 import { trimTextFromEndUntil } from '../helpers/trimmingHelpers.js';
 import { extractData, extractFullPageText } from '../index.js';
-import { deleteTempFiles } from '../utilities/fileUtilities.js';
-import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js';
 import { getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 const debug = Debug('bill-data-extract:enbridge');
 export const enbridgeExtractType = 'enbridge';
@@ -129,8 +127,7 @@ export async function extractEnbridgeBillData(enbridgePdfPath) {
 export async function extractEnbridgeBillDataWithSectorFlow(enbridgeBillPath, sectorFlowApiKey) {
     const sectorFlow = new SectorFlow(sectorFlowApiKey);
     const projectId = await getTemporaryProjectId(sectorFlow);
-    const { imageFilePaths, tempFilePaths } = await pdfOrImageFilePathsToImageFilePaths([enbridgeBillPath]);
-    const sectorFlowFile = await sectorFlow.uploadFile(projectId, imageFilePaths[0]);
+    const sectorFlowFile = await sectorFlow.uploadFile(projectId, enbridgeBillPath);
     const prompt = `Extract
   the "Account Number" as "accountNumber",
   the "Service Address" as "serviceAddress",
@@ -143,7 +140,7 @@ export async function extractEnbridgeBillDataWithSectorFlow(enbridgeBillPath, se
   The "accountNumber" is next to the bill date.
   The "accountNumber does not contain dashes.
   The "dueDate" should be formatted as "yyyy-mm-dd".
-  The "gasUsage" is a number followed by "m3".
+  The "gasUsage" is a number followed by "m3". Return the total amount used, not the "per day" amount.
   The "totalAmountDue" is the dollar amount including taxes.
   The "totalAmountDue" and "gasUsage" should be formatted as numbers.`;
     const response = await sectorFlow.sendChatMessage(projectId, prompt, {
@@ -153,7 +150,6 @@ export async function extractEnbridgeBillDataWithSectorFlow(enbridgeBillPath, se
     });
     const json = JSON.parse(response.choices[0].choices[0].message.content);
     await sectorFlow.deleteProject(projectId);
-    await deleteTempFiles(tempFilePaths);
     json.accountNumber = json.accountNumber?.replaceAll(' ', '');
     json.gasUsageUnit = 'm3';
     return json;

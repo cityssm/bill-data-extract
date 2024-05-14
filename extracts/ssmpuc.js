@@ -5,8 +5,6 @@ import Debug from 'debug';
 import { replaceDateStringTypos } from '../helpers/dateHelpers.js';
 import { cleanNumberText, trimToNumber } from '../helpers/numberHelpers.js';
 import { extractData, extractFullPageText } from '../index.js';
-import { deleteTempFiles } from '../utilities/fileUtilities.js';
-import { pdfOrImageFilePathsToImageFilePaths } from '../utilities/imageUtilities.js';
 import { findAndParseJSON, getTemporaryProjectId } from '../utilities/sectorflowUtilities.js';
 const debug = Debug('bill-data-extract:ssmpuc');
 export const ssmpucExtractType = 'ssmpuc';
@@ -149,8 +147,7 @@ export async function extractSSMPUCBillData(ssmpucBillPath) {
 export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sectorFlowApiKey) {
     const sectorFlow = new SectorFlow(sectorFlowApiKey);
     const projectId = await getTemporaryProjectId(sectorFlow);
-    const { imageFilePaths, tempFilePaths } = await pdfOrImageFilePathsToImageFilePaths([ssmpucBillPath]);
-    const sectorFlowFile = await sectorFlow.uploadFile(projectId, imageFilePaths[0]);
+    const sectorFlowFile = await sectorFlow.uploadFile(projectId, ssmpucBillPath);
     const response = await sectorFlow.sendChatMessage(projectId, `Extract
     the "Account Number" as "accountNumber",
     the "Service Address" as "serviceAddress",
@@ -188,7 +185,6 @@ export async function extractSSMPUCBillDataWithSectorFlow(ssmpucBillPath, sector
     });
     const json = findAndParseJSON(response.choices[0].choices[0].message.content);
     await sectorFlow.deleteProject(projectId);
-    await deleteTempFiles(tempFilePaths);
     json.waterUsageUnit = 'm3';
     json.electricityUsageUnit = 'kWh';
     return json;
