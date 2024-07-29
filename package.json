@@ -35,7 +35,7 @@
   "homepage": "https://github.com/cityssm/bill-data-extract#readme",
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.12.11",
+    "@types/node": "^22.0.0",
     "eslint-config-cityssm": "^2.0.1"
   },
   "dependencies": {
